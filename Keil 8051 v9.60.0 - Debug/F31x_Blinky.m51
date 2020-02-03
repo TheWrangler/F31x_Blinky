@@ -1,4 +1,4 @@
-LX51 LINKER/LOCATER V4.66.97.0                                                          01/28/2020  21:12:22  PAGE 1
+LX51 LINKER/LOCATER V4.66.97.0                                                          01/31/2020  23:28:13  PAGE 1
 
 
 LX51 LINKER/LOCATER V4.66.97.0, INVOKED BY:
@@ -64,7 +64,7 @@ INPUT MODULES INCLUDED:
   D:\SILICONLABS\SIMPLICITYSTUDIO\V4\DEVELOPER\TOOLCHAINS\KEIL_8051\9.60\LIB\C51S.LIB (?C?LNEG)
          COMMENT TYPE 1: A51 / ASM51 Assembler
   D:\SILICONLABS\SIMPLICITYSTUDIO\V4\DEVELOPER\TOOLCHAINS\KEIL_8051\9.60\LIB\C51S.LIB (?C?ULCMP)
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 2
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 2
 
 
          COMMENT TYPE 1: A51 / ASM51 Assembler
@@ -129,7 +129,7 @@ START     STOP      LENGTH    ALIGN  RELOC    MEMORY CLASS   SEGMENT NAME
 0014E7H   001516H   000030H   BYTE   UNIT     CODE           ?PR?SPI0_INTERRUPT?SPI
 001517H   001535H   00001FH   BYTE   UNIT     CODE           ?PR?_BUFFDEL?CMD
 001536H   001551H   00001CH   BYTE   UNIT     CODE           ?PR?CMDCRCCALC?CMD
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 3
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 3
 
 
 001552H   00156DH   00001CH   BYTE   UNIT     CODE           ?PR?INIT_DEVICE?SYS
@@ -194,7 +194,7 @@ UART_INIT/UART                  ----- -----  ----- -----
 SPI_INIT/SPI                    ----- -----  ----- -----
   +--> SPI_GETCLOCKRATE/SPI
 
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 4
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 4
 
 
 SPI_GETCLOCKRATE/SPI            ----- -----  000BH 000EH
@@ -259,7 +259,7 @@ PUBLIC SYMBOLS OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
 
 
       VALUE       CLASS    TYPE      PUBLIC SYMBOL NAME
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 5
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 5
 
 
       =================================================
@@ -324,7 +324,7 @@ PUBLIC SYMBOLS OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
 *SFR* 000000E8H.7 DATA     BIT       ADC0CN_ADEN
 *SFR* 000000E8H.5 DATA     BIT       ADC0CN_ADINT
 *SFR* 000000E8H.6 DATA     BIT       ADC0CN_ADTM
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 6
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 6
 
 
 *SFR* 000000E8H.3 DATA     BIT       ADC0CN_ADWINT
@@ -389,7 +389,7 @@ PUBLIC SYMBOLS OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
 *SFR* 000000B8H.0 DATA     BIT       IP_PX0
 *SFR* 000000B8H.2 DATA     BIT       IP_PX1
 *SFR* 000000E4H   DATA     BYTE      IT01CF
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 7
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 7
 
 
       0100137BH   CODE     ---       main
@@ -454,7 +454,7 @@ PUBLIC SYMBOLS OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
 *SFR* 000000E9H   DATA     WORD      PCA0CP1
 *SFR* 000000EBH   DATA     WORD      PCA0CP2
 *SFR* 000000EDH   DATA     WORD      PCA0CP3
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 8
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 8
 
 
 *SFR* 000000FDH   DATA     WORD      PCA0CP4
@@ -519,7 +519,7 @@ PUBLIC SYMBOLS OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
 *SFR* 000000F8H   DATA     BYTE      SPI0CN
 *SFR* 000000F8H.5 DATA     BIT       SPI0CN_MODF
 *SFR* 000000F8H.2 DATA     BIT       SPI0CN_NSSMD0
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 9
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 9
 
 
 *SFR* 000000F8H.3 DATA     BIT       SPI0CN_NSSMD1
@@ -584,7 +584,7 @@ PUBLIC SYMBOLS OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000046H   DATA     BYTE      Uart_buff_size
       010015DCH   CODE     ---       UART_Init
       0000004DH   DATA     ---       Uart_Recv_buff
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 10
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 10
 
 
       00000052H   DATA     BYTE      Uart_Recv_buff_size
@@ -649,7 +649,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000E9H   SFRSYM    DATA     BYTE      PCA0CPL1
       000000D8H   SFRSYM    DATA     BYTE      PCA0CN
       000000F0H.4 SFRSYM    DATA     BIT       B_B4
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 11
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 11
 
 
       000000DBH   SFRSYM    DATA     BYTE      PCA0CPM1
@@ -714,7 +714,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000A8H.4 SFRSYM    DATA     BIT       IE_ES0
       000000A8H.1 SFRSYM    DATA     BIT       IE_ET0
       000000C8H   SFRSYM    DATA     BYTE      TMR2CN
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 12
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 12
 
 
       000000A8H.3 SFRSYM    DATA     BIT       IE_ET1
@@ -779,7 +779,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000090H.2 SFRSYM    DATA     BIT       P1_B2
       00000080H.3 SFRSYM    DATA     BIT       P0_B3
       000000B0H.1 SFRSYM    DATA     BIT       P3_B1
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 13
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 13
 
 
       000000A0H.2 SFRSYM    DATA     BIT       P2_B2
@@ -844,17 +844,17 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000BDH   SFRSYM    DATA     WORD      ADC0
       000000C0H.3 SFRSYM    DATA     BIT       SMB0CN_ACKRQ
       000000D0H   SFRSYM    DATA     BYTE      PSW
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 14
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 14
 
 
       000000C0H.4 SFRSYM    DATA     BIT       SMB0CN_STO
       000000B7H   SFRSYM    DATA     BYTE      FLKEY
 
       010015D4H   BLOCK     CODE     ---       LVL=0
+      010015D4H   LINE      CODE     ---       #25
+      010015D4H   LINE      CODE     ---       #26
       010015D4H   LINE      CODE     ---       #27
-      010015D4H   LINE      CODE     ---       #28
-      010015D4H   LINE      CODE     ---       #29
-      010015D7H   LINE      CODE     ---       #30
+      010015D7H   LINE      CODE     ---       #28
       ---         BLOCKEND  ---      ---       LVL=0
 
       0100137BH   BLOCK     CODE     ---       LVL=0
@@ -862,27 +862,27 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000008H   SYMBOL    DATA     WORD      adc_var
       0000000AH   SYMBOL    DATA     BYTE      adc_target
       ---         BLOCKEND  ---      ---       LVL=1
-      0100137BH   LINE      CODE     ---       #35
+      0100137BH   LINE      CODE     ---       #33
+      0100137BH   LINE      CODE     ---       #34
       0100137BH   LINE      CODE     ---       #36
-      0100137BH   LINE      CODE     ---       #38
-      0100137EH   LINE      CODE     ---       #40
+      0100137EH   LINE      CODE     ---       #38
+      01001381H   LINE      CODE     ---       #40
+      01001381H   LINE      CODE     ---       #41
       01001381H   LINE      CODE     ---       #42
-      01001381H   LINE      CODE     ---       #43
-      01001381H   LINE      CODE     ---       #44
-      01001395H   LINE      CODE     ---       #45
-      01001395H   LINE      CODE     ---       #46
-      0100139DH   LINE      CODE     ---       #47
-      010013A2H   LINE      CODE     ---       #48
+      01001395H   LINE      CODE     ---       #43
+      01001395H   LINE      CODE     ---       #44
+      0100139DH   LINE      CODE     ---       #45
+      010013A2H   LINE      CODE     ---       #46
+      010013A5H   LINE      CODE     ---       #47
       010013A5H   LINE      CODE     ---       #49
-      010013A5H   LINE      CODE     ---       #51
-      010013ABH   LINE      CODE     ---       #52
-      010013ABH   LINE      CODE     ---       #53
-      010013AEH   LINE      CODE     ---       #54
+      010013ABH   LINE      CODE     ---       #50
+      010013ABH   LINE      CODE     ---       #51
+      010013AEH   LINE      CODE     ---       #52
+      010013B1H   LINE      CODE     ---       #53
       010013B1H   LINE      CODE     ---       #55
-      010013B1H   LINE      CODE     ---       #57
-      010013BFH   LINE      CODE     ---       #58
-      010013C2H   LINE      CODE     ---       #60
-      010013C7H   LINE      CODE     ---       #61
+      010013BFH   LINE      CODE     ---       #56
+      010013C2H   LINE      CODE     ---       #58
+      010013C7H   LINE      CODE     ---       #59
       ---         BLOCKEND  ---      ---       LVL=0
 
       ---         MODULE    ---      ---       CMD
@@ -909,7 +909,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       0000002FH   SYMBOL    DATA     DWORD     gcdNum
       01000FC1H   BLOCK     CODE     NEAR LAB  LVL=1
       0000002FH   SYMBOL    DATA     DWORD     gcdNum
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 15
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 15
 
 
       ---         BLOCKEND  ---      ---       LVL=1
@@ -974,7 +974,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       0100149BH   LINE      CODE     ---       #80
       ---         BLOCKEND  ---      ---       LVL=0
 
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 16
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 16
 
 
       01000A47H   BLOCK     CODE     ---       LVL=0
@@ -1039,7 +1039,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       01000DBEH   LINE      CODE     ---       #144
       01000DCFH   LINE      CODE     ---       #145
       01000DE0H   LINE      CODE     ---       #146
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 17
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 17
 
 
       01000DE3H   LINE      CODE     ---       #147
@@ -1104,7 +1104,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       010006F1H   LINE      CODE     ---       #204
       010006F4H   LINE      CODE     ---       #205
       01000703H   LINE      CODE     ---       #208
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 18
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 18
 
 
       01000703H   LINE      CODE     ---       #209
@@ -1169,7 +1169,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       010008A1H   LINE      CODE     ---       #288
       010008A6H   LINE      CODE     ---       #289
       010008A6H   LINE      CODE     ---       #290
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 19
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 19
 
 
       010008ACH   LINE      CODE     ---       #291
@@ -1234,7 +1234,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       01000A32H   LINE      CODE     ---       #371
       01000A35H   LINE      CODE     ---       #372
       01000A3AH   LINE      CODE     ---       #373
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 20
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 20
 
 
       01000A3DH   LINE      CODE     ---       #374
@@ -1299,7 +1299,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       01000F6CH   LINE      CODE     ---       #59
       01000F7EH   LINE      CODE     ---       #60
       01000F80H   LINE      CODE     ---       #62
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 21
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 21
 
 
       01000F82H   LINE      CODE     ---       #63
@@ -1364,7 +1364,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00010000H   SYMBOL    NUMBER   ---       XBPSTACKTOP
       00000000H   SYMBOL    NUMBER   ---       XDATALEN
       00000000H   SYMBOL    NUMBER   ---       XDATASTART
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 22
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 22
 
 
 
@@ -1429,7 +1429,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000FEH   SFRSYM    DATA     BYTE      PCA0CPH4
       000000F0H.3 SFRSYM    DATA     BIT       B_B3
       000000D9H   SFRSYM    DATA     BYTE      PCA0MD
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 23
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 23
 
 
       000000DAH   SFRSYM    DATA     BYTE      PCA0CPM0
@@ -1494,7 +1494,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000088H   SFRSYM    DATA     BYTE      TCON
       000000E8H.4 SFRSYM    DATA     BIT       ADC0CN_ADBUSY
       000000F8H.5 SFRSYM    DATA     BIT       SPI0CN_MODF
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 24
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 24
 
 
       000000D0H.0 SFRSYM    DATA     BIT       PSW_PARITY
@@ -1559,7 +1559,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000088H.3 SFRSYM    DATA     BIT       TCON_IE1
       000000C0H.1 SFRSYM    DATA     BIT       SMB0CN_ACK
       000000B0H.0 SFRSYM    DATA     BIT       P3_B0
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 25
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 25
 
 
       000000A0H.1 SFRSYM    DATA     BIT       P2_B1
@@ -1624,7 +1624,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000D0H.7 SFRSYM    DATA     BIT       PSW_CY
       000000D8H.3 SFRSYM    DATA     BIT       PCA0CN_CCF3
       000000A3H   SFRSYM    DATA     BYTE      SPI0DAT
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 26
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 26
 
 
       000000D8H.4 SFRSYM    DATA     BIT       PCA0CN_CCF4
@@ -1689,7 +1689,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000090H   SFRSYM    DATA     BYTE      P1
       000000F8H.4 SFRSYM    DATA     BIT       SPI0CN_RXOVRN
       000000A0H   SFRSYM    DATA     BYTE      P2
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 27
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 27
 
 
       000000B0H   SFRSYM    DATA     BYTE      P3
@@ -1754,7 +1754,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000D1H   SFRSYM    DATA     BYTE      REF0CN
       000000F8H.1 SFRSYM    DATA     BIT       SPI0CN_TXBMT
       000000E0H.1 SFRSYM    DATA     BIT       ACC_ACC1
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 28
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 28
 
 
       000000C0H.0 SFRSYM    DATA     BIT       SMB0CN_SI
@@ -1819,7 +1819,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000C8H.5 SFRSYM    DATA     BIT       TMR2CN_TF2LEN
       000000F8H.6 SFRSYM    DATA     BIT       SPI0CN_WCOL
       00000092H   SFRSYM    DATA     WORD      TMR3RL
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 29
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 29
 
 
       000000F8H.2 SFRSYM    DATA     BIT       SPI0CN_NSSMD0
@@ -1884,7 +1884,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000083H   SFRSYM    DATA     BYTE      DPH
       000000E8H.5 SFRSYM    DATA     BIT       ADC0CN_ADINT
       000000C4H   SFRSYM    DATA     BYTE      ADC0GTH
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 30
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 30
 
 
       000000D0H.6 SFRSYM    DATA     BIT       PSW_AC
@@ -1949,7 +1949,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       01000026H   LINE      CODE     ---       #30
       01000029H   LINE      CODE     ---       #32
       0100002CH   LINE      CODE     ---       #34
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 31
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 31
 
 
       01000031H   LINE      CODE     ---       #35
@@ -2014,7 +2014,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000098H.2 SFRSYM    DATA     BIT       SCON0_RB8
       000000CAH   SFRSYM    DATA     BYTE      TMR2RLL
       000000FCH   SFRSYM    DATA     BYTE      PCA0CPH0
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 32
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 32
 
 
       000000E8H.6 SFRSYM    DATA     BIT       ADC0CN_ADTM
@@ -2079,7 +2079,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       0000009AH   SFRSYM    DATA     BYTE      CPT1CN
       000000F3H   SFRSYM    DATA     BYTE      P2MDIN
       000000F4H   SFRSYM    DATA     BYTE      P3MDIN
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 33
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 33
 
 
       000000C8H.7 SFRSYM    DATA     BIT       TMR2CN_TF2H
@@ -2144,7 +2144,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000A8H.6 SFRSYM    DATA     BIT       IE_ESPI0
       0000008BH   SFRSYM    DATA     BYTE      TL1
       000000F9H   SFRSYM    DATA     BYTE      PCA0L
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 34
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 34
 
 
       000000D0H.1 SFRSYM    DATA     BIT       PSW_F1
@@ -2209,7 +2209,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000088H.6 SFRSYM    DATA     BIT       TCON_TR1
       000000C2H   SFRSYM    DATA     BYTE      SMB0DAT
       000000C0H.5 SFRSYM    DATA     BIT       SMB0CN_STA
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 35
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 35
 
 
       000000CDH   SFRSYM    DATA     BYTE      TMR2H
@@ -2274,7 +2274,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       01001564H   LINE      CODE     ---       #72
       01001567H   LINE      CODE     ---       #74
       0100156AH   LINE      CODE     ---       #76
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 36
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 36
 
 
       0100156DH   LINE      CODE     ---       #77
@@ -2339,7 +2339,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000F0H.6 SFRSYM    DATA     BIT       B_B6
       000000C5H   SFRSYM    DATA     WORD      ADC0LT
       000000DDH   SFRSYM    DATA     BYTE      PCA0CPM3
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 37
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 37
 
 
       000000FDH   SFRSYM    DATA     BYTE      PCA0CPL4
@@ -2404,7 +2404,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000A8H.0 SFRSYM    DATA     BIT       IE_EX0
       000000A8H.2 SFRSYM    DATA     BIT       IE_EX1
       0000009FH   SFRSYM    DATA     BYTE      CPT0MX
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 38
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 38
 
 
       00000098H.7 SFRSYM    DATA     BIT       SCON0_SMODE
@@ -2469,7 +2469,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000080H.5 SFRSYM    DATA     BIT       P0_B5
       000000B0H.3 SFRSYM    DATA     BIT       P3_B3
       000000A0H.4 SFRSYM    DATA     BIT       P2_B4
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 39
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 39
 
 
       00000090H.5 SFRSYM    DATA     BIT       P1_B5
@@ -2534,7 +2534,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       ---         BLOCKEND  ---      ---       LVL=1
       01001265H   LINE      CODE     ---       #13
       01001265H   LINE      CODE     ---       #14
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 40
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 40
 
 
       01001265H   LINE      CODE     ---       #17
@@ -2599,7 +2599,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000092H   SFRSYM    DATA     BYTE      TMR3RLL
       000000EAH   SFRSYM    DATA     BYTE      PCA0CPH1
       00000098H.3 SFRSYM    DATA     BIT       SCON0_TB8
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 41
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 41
 
 
       000000F0H.0 SFRSYM    DATA     BIT       B_B0
@@ -2664,7 +2664,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000C8H.3 SFRSYM    DATA     BIT       TMR2CN_T2SPLIT
       000000F8H   SFRSYM    DATA     BYTE      SPI0CN
       000000D0H.3 SFRSYM    DATA     BIT       PSW_RS0
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 42
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 42
 
 
       00000087H   SFRSYM    DATA     BYTE      PCON
@@ -2729,7 +2729,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000080H.0 SFRSYM    DATA     BIT       P0_B0
       000000B8H.0 SFRSYM    DATA     BIT       IP_PX0
       000000C8H.0 SFRSYM    DATA     BIT       TMR2CN_T2XCLK
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 43
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 43
 
 
       00000090H.0 SFRSYM    DATA     BIT       P1_B0
@@ -2794,7 +2794,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       000000A1H   SFRSYM    DATA     BYTE      SPI0CFG
       00000095H   SFRSYM    DATA     BYTE      TMR3H
       0000008EH   SFRSYM    DATA     BYTE      CKCON
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 44
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 44
 
 
       000000C8H.2 SFRSYM    DATA     BIT       TMR2CN_TR2
@@ -2859,7 +2859,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       00000005H   SYMBOL    DATA     BYTE      len
       01001329H   BLOCK     CODE     NEAR LAB  LVL=1
       00000007H   SYMBOL    DATA     BYTE      i
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 45
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 45
 
 
       00000012H   SYMBOL    DATA     BYTE      temp
@@ -2924,7 +2924,7 @@ SYMBOL TABLE OF MODULE:  F31X_BLINKY.OMF.CRBUILD (F31X_BLINKY)
       ---         MODULE    ---      ---       ?C?CSTOPTR
       0100044BH   PUBLIC    CODE     ---       ?C?CSTOPTR
 
-LX51 LINKER/LOCATER V4.66.97.0                                                        01/28/2020  21:12:22  PAGE 46
+LX51 LINKER/LOCATER V4.66.97.0                                                        01/31/2020  23:28:13  PAGE 46
 
 
       ---         MODULE    ---      ---       ?C?IMUL

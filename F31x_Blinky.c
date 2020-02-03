@@ -14,8 +14,6 @@
 extern unsigned char sta_msg_send_complete;
 extern unsigned char sta_cmd_send_complete;
 
-extern idata unsigned char cmd_msg[40];
-
 //-----------------------------------------------------------------------------
 // SiLabs_Startup() Routine
 // ----------------------------------------------------------------------------

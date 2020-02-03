@@ -28,8 +28,8 @@ void SPI_Init()
 
 	//enable master mode,SCK=0 when idle
     SPI0CFG   |= 0x40;
-    //4-wire Single-Master Mode,NSS as cs and 1 when idle
-    SPI0CN    = 0x0D;
+    //3-wire Single-Master Mode
+    SPI0CN    = 0x01;
     //SCK = 2.5Mbps
     SPI0CKR = SPI_GetClockRate();
 }
