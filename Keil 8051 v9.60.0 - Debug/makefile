@@ -12,6 +12,8 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/subdir.mk
+-include Keil\ 8051\ v9.0.0\ -\ Debug/src/subdir.mk
+-include Keil\ 8051\ v9.0.0\ -\ Debug/subdir.mk
 -include subdir.mk
 -include objects.mk
 

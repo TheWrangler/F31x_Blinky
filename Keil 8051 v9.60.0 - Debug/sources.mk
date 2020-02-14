@@ -14,5 +14,7 @@ OBJS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 . \
+Keil\ 8051\ v9.0.0\ -\ Debug \
+Keil\ 8051\ v9.0.0\ -\ Debug/src \
 src \
 

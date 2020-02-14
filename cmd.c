@@ -17,7 +17,7 @@
 //22-23 rate
 //24-27 re-sweep period
 //28 tx衰减
-//29 tx系统模式， bit0-tv，bit1-tr，01-tv,10-tr/tv切换,11-tr/tv固定,bit2-射频开关
+//29 系统模式， bit0-tv，bit1-th，01-tv,11-tr/tv切换,bit2-射频开关
 //30 rx三个接收通道供电控制，bit0-通道1，bit1-通道2，bit2-通道3
 //31-33 rx三个接收通道衰减
 //34-36 rx三个接收通道移相控制
@@ -182,7 +182,6 @@ unsigned char Frame2CmdConvert()
 
 		var = String2Long(Uart_buff+4,6);
 		var /= 32768;
-		var /= 4;
 		var *= step_scale;
 		Format2Cmd(cmd_msg+18,var);
 
