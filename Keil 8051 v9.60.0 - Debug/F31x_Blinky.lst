@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       02/14/2020 17:19:11 PAGE 1   
+C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       02/25/2020 16:16:45 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE F31X_BLINKY
@@ -63,7 +63,7 @@ line level    source
   50   2                      {
   51   3                              State_Msg();
   52   3                              UART_Send();
-C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       02/14/2020 17:19:11 PAGE 2   
+C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       02/25/2020 16:16:45 PAGE 2   
 
   53   3                      }
   54   2      

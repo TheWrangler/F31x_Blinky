@@ -17,21 +17,24 @@
 //22-23 rate
 //24-27 re-sweep period
 //28 tx衰减
-//29 系统模式， bit0-tv，bit1-th，01-tv,11-tr/tv切换,bit2-射频开关
+//29 系统模式， bit0-tv，bit1-th，01-tv,11-tr/tv切换,bit2-校准使能，bit3-射频开关
 //30 rx三个接收通道供电控制，bit0-通道1，bit1-通道2，bit2-通道3
 //31-33 rx三个接收通道衰减
 //34-36 rx三个接收通道移相控制
-//37 预留
-//38 预留
-//39 crc
+//37~40 校准时长
+//41 crc
 
-idata unsigned char cmd_msg[40] = {0xeb,0x90};
+idata unsigned char cmd_msg[42] = {0xeb,0x90};
 
 unsigned char Uart_buff[15];
 unsigned char Uart_buff_size = 0;
 
 float step_scale = 4294967296.0 / 3400.0;//2^32/fs
 float clock_scale = 24.0 / 3400.0;  //us
+
+unsigned long freq_modulate = 20;//MHz/us
+unsigned long freq_sweep_bw = 250;//us
+unsigned long freq_mid = 17500;//MHz
 
 //求最大公约数
 unsigned long gcd(unsigned long x, unsigned long y)
@@ -86,7 +89,8 @@ void FTWGen(unsigned long freq)
 	float temp,m,n;
 
 	//整数频率
-	ftw = freq - 125;
+	ftw = freq_sweep_bw >> 1;
+	ftw = freq - ftw;
 	div = gcd(ftw,3400);
 	m = ftw / div;
 	n = 3400 / div;
@@ -94,13 +98,13 @@ void FTWGen(unsigned long freq)
 	temp *= 65536.0;
 	temp *= m;
 	ftw = temp;
-	//Format2Cmd(cmd_msg+2,ftw);
 	cmd_msg[2] = ((ftw & 0xff000000) >> 24);
 	cmd_msg[3] = ((ftw & 0xff0000) >> 16);
 	cmd_msg[4] = ((ftw & 0xff00) >> 8);
 	cmd_msg[5] = ftw;
 
-	ftw = freq + 125;
+	ftw = freq_sweep_bw >> 1;
+	ftw = freq + ftw;
 	div = gcd(ftw,3400);
 	m = ftw / div;
 	n = 3400 / div;
@@ -108,14 +112,14 @@ void FTWGen(unsigned long freq)
 	temp *= 65536.0;
 	temp *= m;
 	ftw = temp;
-	//Format2Cmd(cmd_msg+6,ftw);
 	cmd_msg[6] = ((ftw & 0xff000000) >> 24);
 	cmd_msg[7] = ((ftw & 0xff0000) >> 16);
 	cmd_msg[8] = ((ftw & 0xff00) >> 8);
 	cmd_msg[9] = ftw;
 
 	//小数频率
-	m = freq + 2.5 - 125;
+	ftw = freq_sweep_bw >> 1;
+	m = freq + 2.5 - ftw;
 	ftw = m *10.0;
 	div = gcd(ftw,34000);
 	m = ftw / div;
@@ -124,13 +128,13 @@ void FTWGen(unsigned long freq)
 	temp *= 65536.0;
 	temp *= m;
 	ftw = temp;
-	//Format2Cmd(cmd_msg+10,ftw);
 	cmd_msg[10] = ((ftw & 0xff000000) >> 24);
 	cmd_msg[11] = ((ftw & 0xff0000) >> 16);
 	cmd_msg[12] = ((ftw & 0xff00) >> 8);
 	cmd_msg[13] = ftw;
 
-	m = freq + 2.5 + 125;
+	ftw = freq_sweep_bw >> 1;
+	m = freq + 2.5 + ftw;
 	ftw = m * 10.0;
 	div = gcd(ftw,34000);
 	m = ftw / div;
@@ -139,7 +143,6 @@ void FTWGen(unsigned long freq)
 	temp *= 65536.0;
 	temp *= m;
 	ftw = temp;
-	//Format2Cmd(cmd_msg+14,ftw);
 	cmd_msg[14] = ((ftw & 0xff000000) >> 24);
 	cmd_msg[15] = ((ftw & 0xff0000) >> 16);
 	cmd_msg[16] = ((ftw & 0xff00) >> 8);
@@ -157,15 +160,16 @@ void BuffDel(unsigned char len)
 void CmdCrcCalc()
 {
 	unsigned char i;
-	cmd_msg[39] = 0;
-	for(i=0;i<39;i++)
-		cmd_msg[39] += cmd_msg[i];
+	cmd_msg[41] = 0;
+	for(i=0;i<41;i++)
+		cmd_msg[41] += cmd_msg[i];
 }
 
 unsigned char Frame2CmdConvert()
 {
 	unsigned char len;
 	unsigned long var;
+	float fvar;
 
 	len = UART_GetBuff(Uart_buff + Uart_buff_size,15-Uart_buff_size);
 	Uart_buff_size += len;
@@ -182,8 +186,7 @@ unsigned char Frame2CmdConvert()
 
 		var = String2Long(Uart_buff+4,6);
 		var /= 32768;
-		var *= step_scale;
-		Format2Cmd(cmd_msg+18,var);
+		freq_modulate = var;
 
 		len = 10;
 	}
@@ -195,9 +198,16 @@ unsigned char Frame2CmdConvert()
 			return 0;
 
 		var = String2Long(Uart_buff+4,7);
-		var /= clock_scale;
-		cmd_msg[22] = ((var & 0xff00) >> 8);
-		cmd_msg[23] = var;
+		freq_sweep_bw = freq_modulate * var;
+		freq_sweep_bw /= 4;
+
+		fvar = var / clock_scale;
+		fvar = freq_sweep_bw / fvar;
+		var = fvar * step_scale;
+		Format2Cmd(cmd_msg+18,var);
+
+		cmd_msg[22] = 0x00;
+		cmd_msg[23] = 0x01;
 
 		len = 11;
 	}
@@ -217,8 +227,8 @@ unsigned char Frame2CmdConvert()
 		if(Uart_buff_size < 5)
 			return 0;
 		if(Uart_buff[4] == '1')
-			cmd_msg[29] |= 0x04;
-		else cmd_msg[29] &= ~0x04;
+			cmd_msg[29] |= 0x08;
+		else cmd_msg[29] &= ~0x08;
 		len = 5;
 	}
 	else if((Uart_buff[0] == '#')
@@ -227,6 +237,18 @@ unsigned char Frame2CmdConvert()
 	{
 		if(Uart_buff_size < 10)
 			return 0;
+
+		var = String2Long(Uart_buff+4,6);
+		if(var != 0)
+			cmd_msg[29] |= 0x04;
+		else cmd_msg[29] &= ~0x04;
+
+		fvar = var;
+		fvar /= 10.0;
+		fvar /= clock_scale;
+		fvar *= 1000000.0;
+		var = fvar;
+		Format2Cmd(cmd_msg+37,var);
 
 		len = 10;
 	}
@@ -242,7 +264,7 @@ unsigned char Frame2CmdConvert()
 		var -= 13500;
 		var /= 4;
 
-		FTWGen(var);
+		freq_mid = var;
 
 		len = 10;
 	}
@@ -299,7 +321,9 @@ unsigned char Frame2CmdConvert()
 		if(Uart_buff_size < 7)
 			return 0;
 		var = String2Long(Uart_buff+5,2);
+		var = (var << 1);
 		cmd_msg[28] = var;
+		cmd_msg[28] = ~cmd_msg[28];
 		len = 7;
 	}
 	else if((Uart_buff[0] == '#')
@@ -367,6 +391,8 @@ unsigned char Frame2CmdConvert()
 		var = String2Long(Uart_buff+5,2);
 		cmd_msg[36] = var;
 		len = 7;
+
+		FTWGen(freq_mid);
 		CmdCrcCalc();
 		BuffDel(len);
 		return 1;

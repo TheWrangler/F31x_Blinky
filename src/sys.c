@@ -56,8 +56,6 @@ void Interrupts_Init()
 {
     IP        = 0x10;
     IE        = 0x50;
-    //EIE1      |= 0x08;
-    //EIP1      |= 0x08;
 }
 
 void Init_Device(void)

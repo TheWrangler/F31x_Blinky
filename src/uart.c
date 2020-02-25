@@ -80,4 +80,3 @@ unsigned char UART_GetBuff(unsigned char* pBuf,unsigned char len)
 
 	return len;
 }
-

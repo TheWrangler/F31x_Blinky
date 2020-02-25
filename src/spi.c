@@ -9,7 +9,7 @@
 
 extern unsigned long Sys_Clk;
 
-extern idata unsigned char cmd_msg[40];
+extern idata unsigned char cmd_msg[42];
 unsigned char sta_cmd_send_count = 0;
 unsigned char sta_cmd_send_complete = 1;
 
@@ -40,7 +40,7 @@ SI_INTERRUPT(SPI0_Interrupt, 6)
 	{
 		SPI0CN &= ~0x80;
 
-		if(sta_cmd_send_count == 40)
+		if(sta_cmd_send_count == 42)
 		{
 			sta_cmd_send_complete = 1;
 			return;
