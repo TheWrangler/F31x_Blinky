@@ -17,7 +17,7 @@
 //22-23 rate
 //24-27 re-sweep period
 //28 tx衰减
-//29 系统模式， bit0-tv，bit1-th，01-tv,11-tr/tv切换,bit2-校准使能，bit3-射频开关
+//29 系统模式， 01-tv,11-tr/tv切换,bit2-校准使能，bit3-射频开关
 //30 rx三个接收通道供电控制，bit0-通道1，bit1-通道2，bit2-通道3
 //31-33 rx三个接收通道衰减
 //34-36 rx三个接收通道移相控制
@@ -298,12 +298,12 @@ unsigned char Frame2CmdConvert()
 		}
 		else if(Uart_buff[5] == '2')
 		{
-			cmd_msg[29] |= 0x02;
+			cmd_msg[29] |= 0x03;
 			cmd_msg[30] |= 0x03;
 		}
-		else if(Uart_buff[5] == '2')
+		else if(Uart_buff[5] == '3')
 		{
-			cmd_msg[29] |= 0x03;
+			cmd_msg[29] |= 0x01;
 			cmd_msg[30] |= 0x03;
 		}
 		else if(Uart_buff[5] == '4')
@@ -324,6 +324,7 @@ unsigned char Frame2CmdConvert()
 		var = (var << 1);
 		cmd_msg[28] = var;
 		cmd_msg[28] = ~cmd_msg[28];
+
 		len = 7;
 	}
 	else if((Uart_buff[0] == '#')
@@ -334,7 +335,14 @@ unsigned char Frame2CmdConvert()
 		if(Uart_buff_size < 7)
 			return 0;
 		var = String2Long(Uart_buff+5,2);
-		cmd_msg[31] = var;
+		var = ~var;
+		cmd_msg[31] = 0;
+		cmd_msg[31] |= (var & 0x01)<<5;
+		cmd_msg[31] |= (var & 0x02)<<3;
+		cmd_msg[31] |= (var & 0x04)<<1;
+		cmd_msg[31] |= (var & 0x08)>>1;
+		cmd_msg[31] |= (var & 0x10)>>3;
+		cmd_msg[31] |= (var & 0x20)>>5;
 		len = 7;
 	}
 	else if((Uart_buff[0] == '#')
@@ -356,7 +364,14 @@ unsigned char Frame2CmdConvert()
 		if(Uart_buff_size < 7)
 			return 0;
 		var = String2Long(Uart_buff+5,2);
-		cmd_msg[32] = var;
+		var = ~var;
+		cmd_msg[32] = 0;
+		cmd_msg[32] |= (var & 0x01)<<5;
+		cmd_msg[32] |= (var & 0x02)<<3;
+		cmd_msg[32] |= (var & 0x04)<<1;
+		cmd_msg[32] |= (var & 0x08)>>1;
+		cmd_msg[32] |= (var & 0x10)>>3;
+		cmd_msg[32] |= (var & 0x20)>>5;
 		len = 7;
 	}
 	else if((Uart_buff[0] == '#')
@@ -378,7 +393,14 @@ unsigned char Frame2CmdConvert()
 		if(Uart_buff_size < 7)
 			return 0;
 		var = String2Long(Uart_buff+5,2);
-		cmd_msg[33] = var;
+		var = ~var;
+		cmd_msg[33] = 0;
+		cmd_msg[33] |= (var & 0x01)<<5;
+		cmd_msg[33] |= (var & 0x02)<<3;
+		cmd_msg[33] |= (var & 0x04)<<1;
+		cmd_msg[33] |= (var & 0x08)>>1;
+		cmd_msg[33] |= (var & 0x10)>>3;
+		cmd_msg[33] |= (var & 0x20)>>5;
 		len = 7;
 	}
 	else if((Uart_buff[0] == '#')
