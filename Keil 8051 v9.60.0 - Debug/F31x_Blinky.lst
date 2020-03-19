@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       03/17/2020 17:01:28 PAGE 1   
+C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       03/19/2020 17:00:45 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE F31X_BLINKY
@@ -55,28 +55,35 @@ line level    source
   42   2                      if(ADC_Get(&adc_var) == 1)
   43   2                      {
   44   3                              if(adc_target == 0)
-  45   3                                      Teamperature_Convert(adc_var);
-  46   3                              else Bite_Convert(adc_var);
-  47   3                      }
-  48   2      
-  49   2                      if(sta_msg_send_complete == 1)
-  50   2                      {
-  51   3                              State_Msg();
-  52   3                              UART_Send();
-C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       03/17/2020 17:01:28 PAGE 2   
+  45   3                              {
+  46   4                                      Teamperature_Convert(adc_var);
+  47   4                                      adc_target = 1;
+  48   4                              }
+  49   3                              else
+  50   3                              {
+  51   4                                      Bite_Convert(adc_var);
+  52   4                                      adc_target = 0;
+C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       03/19/2020 17:00:45 PAGE 2   
 
-  53   3                      }
-  54   2      
-  55   2                      if((Frame2CmdConvert() == 1) && (sta_cmd_send_complete == 1))
-  56   2                              SPI_Send();
-  57   2      
-  58   2                      ADC_Start(adc_target);
-  59   2              }
-  60   1      }
+  53   4                              }
+  54   3                      }
+  55   2      
+  56   2                      if(sta_msg_send_complete == 1)
+  57   2                      {
+  58   3                              State_Msg();
+  59   3                              UART_Send();
+  60   3                      }
+  61   2      
+  62   2                      if((Frame2CmdConvert() == 1) && (sta_cmd_send_complete == 1))
+  63   2                              SPI_Send();
+  64   2      
+  65   2                      ADC_Start(adc_target);
+  66   2              }
+  67   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     82    ----
+   CODE SIZE        =     88    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

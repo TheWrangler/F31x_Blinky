@@ -42,8 +42,15 @@ void main (void)
 		if(ADC_Get(&adc_var) == 1)
 		{
 			if(adc_target == 0)
+			{
 				Teamperature_Convert(adc_var);
-			else Bite_Convert(adc_var);
+				adc_target = 1;
+			}
+			else
+			{
+				Bite_Convert(adc_var);
+				adc_target = 0;
+			}
 		}
 
 		if(sta_msg_send_complete == 1)
