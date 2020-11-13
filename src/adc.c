@@ -51,7 +51,7 @@ void ADC_Start(char target)
 
 	if(target == 0)
 		AMX0P = 0x1e;
-	else AMX0P = 0x12;
+	else AMX0P = 0x12;//P3.2
 
 	//ADC0CN |= 0x80;
 	ADC0CN |= 0x10;

@@ -79,8 +79,8 @@ void Bite_Convert(unsigned int adc_var)
 	bite = adc_var;
 	bite *= 3.3;
 	bite /= 4096.0;
-	bite *= 33.7985;
-	bite += 16.9617;
+//	bite *= 33.7985;
+//	bite += 16.9617;
 }
 
 void UpdateFrame()

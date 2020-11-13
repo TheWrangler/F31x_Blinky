@@ -491,7 +491,7 @@ unsigned char AAParser(unsigned char* buf,unsigned char index)
 //	cmd_msg[index] |= (var & 0x08)>>1;
 //	cmd_msg[index] |= (var & 0x10)>>3;
 //	cmd_msg[index] |= (var & 0x20)>>5;
-	cmd_msg[index] = var * 5.625;
+	cmd_msg[index] = var;
 
 	return 1;
 }

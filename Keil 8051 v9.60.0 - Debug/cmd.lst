@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 1   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE CMD
@@ -63,7 +63,7 @@ line level    source
   50   2                      {
   51   3                              x /= 2;
   52   3                              y /= 2;
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 2   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 2   
 
   53   3                              gcdNum *= 2;
   54   3                      }
@@ -128,7 +128,7 @@ line level    source
  113   1              ftw = freq_sweep_bw >> 1;
  114   1              ftw = freq - ftw;
  115   1              div = gcd(ftw,3400);
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 3   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 3   
 
  116   1              m = ftw / div;
  117   1              n = 3400 / div;
@@ -193,7 +193,7 @@ line level    source
  176   1        return i;
  177   1      }
  178          
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 4   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 4   
 
  179          //ASCII命令转二进制命令
  180          unsigned char Frame2CmdConvert()
@@ -258,7 +258,7 @@ line level    source
  239   2                      return 0;
  240   2              }
  241   1      
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 5   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 5   
 
  242   1              if(CTParser(packet_buff+75) == 0)
  243   1              {
@@ -323,7 +323,7 @@ line level    source
  302   1        unsigned long var;
  303   1      
  304   1        if((buf[0] != '#')
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 6   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 6   
 
  305   1              || (buf[1] != 'K')
  306   1              || (buf[2] != 'R')
@@ -388,7 +388,7 @@ line level    source
  365   1      }
  366          
  367          unsigned char PRTParser(unsigned char * buf)
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 7   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 7   
 
  368          {
  369   1              unsigned long var;
@@ -453,7 +453,7 @@ line level    source
  428   1                    || (buf[3] != 'D')
  429   1                    || (buf[4] != ':')
  430   1                    || (buf[6] != ';'))
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 8   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 8   
 
  431   1                        return 0;
  432   1      
@@ -518,9 +518,9 @@ line level    source
  491   1      //      cmd_msg[index] |= (var & 0x08)>>1;
  492   1      //      cmd_msg[index] |= (var & 0x10)>>3;
  493   1      //      cmd_msg[index] |= (var & 0x20)>>5;
-C51 COMPILER V9.60.0.0   CMD                                                               11/12/2020 21:30:54 PAGE 9   
+C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 9   
 
- 494   1              cmd_msg[index] = var * 5.625;
+ 494   1              cmd_msg[index] = var;
  495   1      
  496   1              return 1;
  497   1      }
@@ -568,7 +568,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   3228    ----
+   CODE SIZE        =   3211    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =    169      86

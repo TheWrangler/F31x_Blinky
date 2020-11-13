@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   ADC                                                               11/11/2020 22:43:56 PAGE 1   
+C51 COMPILER V9.60.0.0   ADC                                                               11/13/2020 10:10:43 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE ADC
@@ -63,10 +63,10 @@ line level    source
   50   1          return;
   51   1      
   52   1              if(target == 0)
-C51 COMPILER V9.60.0.0   ADC                                                               11/11/2020 22:43:56 PAGE 2   
+C51 COMPILER V9.60.0.0   ADC                                                               11/13/2020 10:10:43 PAGE 2   
 
   53   1                      AMX0P = 0x1e;
-  54   1              else AMX0P = 0x12;
+  54   1              else AMX0P = 0x12;//P3.2
   55   1      
   56   1              //ADC0CN |= 0x80;
   57   1              ADC0CN |= 0x10;

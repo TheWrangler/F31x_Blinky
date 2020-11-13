@@ -40,19 +40,7 @@ void main (void)
 	while(1)
 	{
 	  ADC_Start(adc_target);
-		if(ADC_Get(&adc_var) == 1)
-		{
-			if(adc_target == 0)
-			{
-				Teamperature_Convert(adc_var);
-				adc_target = 1;
-			}
-			else
-			{
-				Bite_Convert(adc_var);
-				adc_target = 0;
-			}
-		}
+
 
 //		if(Frame2CmdConvert() == 1)
 //		{
@@ -75,6 +63,20 @@ void main (void)
 
       UpdateSta();
       UART_Send();
+    }
+
+		if(ADC_Get(&adc_var) == 1)
+    {
+      if(adc_target == 0)
+      {
+        Teamperature_Convert(adc_var);
+        adc_target = 1;
+      }
+      else
+      {
+        Bite_Convert(adc_var);
+        adc_target = 0;
+      }
     }
 	}
 }
