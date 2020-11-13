@@ -1,15 +1,18 @@
 /*
  * uart.h
  *
- *  Created on: 2020Äê1ÔÂ22ÈÕ
+ *  Created on: 2020ï¿½ï¿½1ï¿½ï¿½22ï¿½ï¿½
  *      Author: wrangler
  */
 
 #ifndef UART_H_
 #define UART_H_
 
+#define UART_RECV_BUF_NUM 10
+
 void UART_Init();
 void UART_Send();
-unsigned char UART_GetBuff(unsigned char* pBuf,unsigned char len);
+//unsigned char UART_GetBuff(unsigned char* pBuf,unsigned char len);
+void UART_GetBuff(/*unsigned char* pBuf,unsigned char len*/);
 
 #endif /* UART_H_ */

@@ -1,16 +1,19 @@
 /*
  * sta.c
  *
- *  Created on: 2020Äê1ÔÂ27ÈÕ
+ *  Created on: 2020å¹´1æœˆ27æ—¥
  *      Author: wrangler
  */
 #include "sta.h"
+#include "cmd.h"
 
-extern idata unsigned char sta_msg[18];
-extern unsigned char sta_msg_len;
+idata unsigned char sta_msg[STA_MSG_LEN];
+unsigned char sta_msg_len = 0;
 
 float temperature = 0.0;
 float bite = 0.0;
+
+extern unsigned char packet_buff[ASCII_FRAME_LEN];
 
 unsigned char Float_Format(float var,unsigned char* pBuf)
 {
@@ -80,19 +83,39 @@ void Bite_Convert(unsigned int adc_var)
 	bite += 16.9617;
 }
 
-void State_Msg()
+void UpdateFrame()
 {
-	sta_msg_len = 5;
-	sta_msg_len += Float_Format(temperature,sta_msg+sta_msg_len);
-	sta_msg[sta_msg_len] = ',';
-	sta_msg_len++;
-	sta_msg_len += Float_Format(bite,sta_msg+sta_msg_len);
+  unsigned char i;
+  for(i=0;i<ASCII_FRAME_LEN;i++)
+    sta_msg[i] = packet_buff[i];
+}
 
-	sta_msg[sta_msg_len] = '*';
-	sta_msg_len++;
-	sta_msg[sta_msg_len] = 0x0d;
-	sta_msg_len++;
+void UpdateSta()
+{
+  unsigned char len;
 
-	sta_msg[sta_msg_len] = 0x0a;
-	sta_msg_len++;
+  sta_msg_len = ASCII_FRAME_LEN;
+
+  sta_msg[sta_msg_len++] = '#';
+  sta_msg[sta_msg_len++] = 'T';
+  sta_msg[sta_msg_len++] = 'P';
+  sta_msg[sta_msg_len++] = ':';
+
+  len = Float_Format(temperature,sta_msg+sta_msg_len);
+  sta_msg_len += len;
+
+  sta_msg[sta_msg_len++] = ';';
+
+  sta_msg[sta_msg_len++] = '#';
+  sta_msg[sta_msg_len++] = 'B';
+  sta_msg[sta_msg_len++] = 'T';
+  sta_msg[sta_msg_len++] = ':';
+
+  len = Float_Format(bite,sta_msg+sta_msg_len);
+  sta_msg_len += len;
+
+  sta_msg[sta_msg_len++] = ';';
+  sta_msg[sta_msg_len++] = '*';
+  sta_msg[sta_msg_len++] = 0x0d;
+  sta_msg[sta_msg_len++] = 0x0a;
 }

@@ -1,17 +1,18 @@
 /*
  * spi.c
  *
- *  Created on: 2020Äê1ÔÂ22ÈÕ
+ *  Created on: 2020ï¿½ï¿½1ï¿½ï¿½22ï¿½ï¿½
  *      Author: wrangler
  */
 #include <SI_C8051F310_Register_Enums.h>
 #include "spi.h"
+#include "../cmd.h"
 
 extern unsigned long Sys_Clk;
 
-extern idata unsigned char cmd_msg[42];
-unsigned char sta_cmd_send_count = 0;
-unsigned char sta_cmd_send_complete = 1;
+extern idata unsigned char cmd_msg[CMD_MSG_LEN];
+unsigned char spi_cmd_send_count = 0;
+unsigned char spi_cmd_send_complete = 1;
 
 unsigned char SPI_GetClockRate()
 {
@@ -40,14 +41,14 @@ SI_INTERRUPT(SPI0_Interrupt, 6)
 	{
 		SPI0CN &= ~0x80;
 
-		if(sta_cmd_send_count == 42)
+		if(spi_cmd_send_count == CMD_MSG_LEN)
 		{
-			sta_cmd_send_complete = 1;
+		  spi_cmd_send_complete = 1;
 			return;
 		}
 
-		SPI0DAT = cmd_msg[sta_cmd_send_count];
-		sta_cmd_send_count++;
+		SPI0DAT = cmd_msg[spi_cmd_send_count];
+		spi_cmd_send_count++;
 	}
 
 	SPI0CN &= ~0x70;
@@ -55,8 +56,8 @@ SI_INTERRUPT(SPI0_Interrupt, 6)
 
 void SPI_Send(/*unsigned char* pBuf,unsigned char len*/)
 {
-	sta_cmd_send_count = 0;
-	sta_cmd_send_complete = 0;
+  spi_cmd_send_count = 0;
+  spi_cmd_send_complete = 0;
 	SPI0CN |= 0x80;
 
 //	unsigned char i;

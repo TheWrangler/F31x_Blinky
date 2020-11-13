@@ -1,7 +1,7 @@
 /*
  * cmd.c
  *
- *  Created on: 2020Äê1ÔÂ27ÈÕ
+ *  Created on: 2020å¹´1æœˆ27æ—¥
  *      Author: wrangler
  */
 #include "./src/uart.h"
@@ -15,28 +15,32 @@
 //14-17 ftw_upper_2
 //18-21 step
 //22-23 rate
-//24-27 re-sweep period
-//28 txË¥¼õ
-//29 ÏµÍ³Ä£Ê½£¬ 01-tv,11-tr/tvÇÐ»»,bit2-Ð£×¼Ê¹ÄÜ£¬bit3-ÉäÆµ¿ª¹Ø
-//30 rxÈý¸ö½ÓÊÕÍ¨µÀ¹©µç¿ØÖÆ£¬bit0-Í¨µÀ1£¬bit1-Í¨µÀ2£¬bit2-Í¨µÀ3
-//31-33 rxÈý¸ö½ÓÊÕÍ¨µÀË¥¼õ
-//34-36 rxÈý¸ö½ÓÊÕÍ¨µÀÒÆÏà¿ØÖÆ
-//37~40 Ð£×¼Ê±³¤
-//41 crc
+//24-25 pulse_period,us
+//26-28 re-sweep period,us
+//29 txè¡°å‡
+//30 bit0~bit2ç³»ç»Ÿæ¨¡å¼ 001-tv,010-th/tvåˆ‡æ¢,011-th/två›ºå®š,100-ä¸€å‘ä¸‰æ”¶,bit3-å°„é¢‘å¼€å…³
+//31-33 rxä¸‰ä¸ªæŽ¥æ”¶é€šé“è¡°å‡
+//34-36 rxä¸‰ä¸ªæŽ¥æ”¶é€šé“ç§»ç›¸æŽ§åˆ¶
+//37~40 æ ¡å‡†æ—¶é•¿,ms
+//41~44 è§¦å‘å»¶è¿Ÿ,us
+//45 crc
 
-idata unsigned char cmd_msg[42] = {0xeb,0x90};
+idata unsigned char cmd_msg[CMD_MSG_LEN] = {0xeb,0x90};
+unsigned char cmd_msg_valid = 0;
 
-unsigned char Uart_buff[15];
-unsigned char Uart_buff_size = 0;
+unsigned char packet_buff[ASCII_FRAME_LEN];
+unsigned char packet_buff_size = 0;
 
-float step_scale = 4294967296.0 / 3400.0;//2^32/fs
-float clock_scale = 24.0 / 3400.0;  //us
+double step_scale = 4294967296.0 / 3400.0;//2^32/fs
+double clock_scale = 24.0 / 3400.0;  //us
 
 unsigned long freq_modulate = 20;//MHz/us
 unsigned long freq_sweep_bw = 250;//us
 unsigned long freq_mid = 17500;//MHz
 
-//Çó×î´ó¹«Ô¼Êý
+extern unsigned char spi_cmd_send_complete;
+
+//æ±‚æœ€å¤§å…¬çº¦æ•°
 unsigned long gcd(unsigned long x, unsigned long y)
 {
 	unsigned long gcdNum = 1;
@@ -59,6 +63,7 @@ unsigned long gcd(unsigned long x, unsigned long y)
 	return gcdNum * x;
 }
 
+//å­—ç¬¦ä¸²è½¬æ•°å€¼
 unsigned long String2Long(unsigned char* buf,unsigned char dec)
 {
 	unsigned char i;
@@ -75,20 +80,36 @@ unsigned long String2Long(unsigned char* buf,unsigned char dec)
 	return res;
 }
 
-void Format2Cmd(unsigned char* cmd,unsigned long var)
+//32ä½è½¬æ¢ä½æ•°ç»„
+void Format2Cmd(unsigned char* cmd,unsigned long var,unsigned char byte_width)
 {
-	cmd[0] = ((var & 0xff000000) >> 24);
-	cmd[1] = ((var & 0xff0000) >> 16);
-	cmd[2] = ((var & 0xff00) >> 8);
-	cmd[3] = var;
+  if(byte_width == 4)
+  {
+      cmd[0] = ((var & 0xff000000) >> 24);
+      cmd[1] = ((var & 0xff0000) >> 16);
+      cmd[2] = ((var & 0xff00) >> 8);
+      cmd[3] = var;
+  }
+  else if(byte_width == 3)
+  {
+      cmd[0] = ((var & 0xff0000) >> 16);
+      cmd[1] = ((var & 0xff00) >> 8);
+      cmd[2] = var;
+  }
+  else
+  {
+      cmd[0] = ((var & 0xff00) >> 8);
+      cmd[1] = var;
+  }
 }
 
-void FTWGen(unsigned long freq)
+//FTWè®¡ç®—
+void FTWGen(unsigned long freq,unsigned char* cmd_msg)
 {
 	unsigned long ftw=0,div;
-	float temp,m,n;
+	double temp,m,n;
 
-	//ÕûÊýÆµÂÊ
+	//æ•´æ•°é¢‘çŽ‡
 	ftw = freq_sweep_bw >> 1;
 	ftw = freq - ftw;
 	div = gcd(ftw,3400);
@@ -98,10 +119,10 @@ void FTWGen(unsigned long freq)
 	temp *= 65536.0;
 	temp *= m;
 	ftw = temp;
-	cmd_msg[2] = ((ftw & 0xff000000) >> 24);
-	cmd_msg[3] = ((ftw & 0xff0000) >> 16);
-	cmd_msg[4] = ((ftw & 0xff00) >> 8);
-	cmd_msg[5] = ftw;
+	cmd_msg[0] = ((ftw & 0xff000000) >> 24);
+	cmd_msg[1] = ((ftw & 0xff0000) >> 16);
+	cmd_msg[2] = ((ftw & 0xff00) >> 8);
+	cmd_msg[3] = ftw;
 
 	ftw = freq_sweep_bw >> 1;
 	ftw = freq + ftw;
@@ -112,319 +133,406 @@ void FTWGen(unsigned long freq)
 	temp *= 65536.0;
 	temp *= m;
 	ftw = temp;
-	cmd_msg[6] = ((ftw & 0xff000000) >> 24);
-	cmd_msg[7] = ((ftw & 0xff0000) >> 16);
-	cmd_msg[8] = ((ftw & 0xff00) >> 8);
-	cmd_msg[9] = ftw;
-
-	//Ð¡ÊýÆµÂÊ
-	ftw = freq_sweep_bw >> 1;
-	m = freq + 2.5 - ftw;
-	ftw = m *10.0;
-	div = gcd(ftw,34000);
-	m = ftw / div;
-	n = 34000 / div;
-	temp = 65536.0 / n;
-	temp *= 65536.0;
-	temp *= m;
-	ftw = temp;
-	cmd_msg[10] = ((ftw & 0xff000000) >> 24);
-	cmd_msg[11] = ((ftw & 0xff0000) >> 16);
-	cmd_msg[12] = ((ftw & 0xff00) >> 8);
-	cmd_msg[13] = ftw;
-
-	ftw = freq_sweep_bw >> 1;
-	m = freq + 2.5 + ftw;
-	ftw = m * 10.0;
-	div = gcd(ftw,34000);
-	m = ftw / div;
-	n = 34000 / div;
-	temp = 65536.0 / n;
-	temp *= 65536.0;
-	temp *= m;
-	ftw = temp;
-	cmd_msg[14] = ((ftw & 0xff000000) >> 24);
-	cmd_msg[15] = ((ftw & 0xff0000) >> 16);
-	cmd_msg[16] = ((ftw & 0xff00) >> 8);
-	cmd_msg[17] = ftw;
+	cmd_msg[4] = ((ftw & 0xff000000) >> 24);
+	cmd_msg[5] = ((ftw & 0xff0000) >> 16);
+	cmd_msg[6] = ((ftw & 0xff00) >> 8);
+	cmd_msg[7] = ftw;
 }
 
 void BuffDel(unsigned char len)
 {
 	unsigned char i;
-	Uart_buff_size -= len;
-	for(i=0;i<Uart_buff_size;i++)
-		Uart_buff[i] = Uart_buff[i+len];
+	packet_buff_size -= len;
+	for(i=0;i<packet_buff_size;i++)
+	  packet_buff[i] = packet_buff[i+len];
 }
 
+//è®¡ç®—ç´¯åŠ å’Œæ ¡éªŒ
 void CmdCrcCalc()
 {
 	unsigned char i;
-	cmd_msg[41] = 0;
-	for(i=0;i<41;i++)
-		cmd_msg[41] += cmd_msg[i];
+	cmd_msg[CMD_MSG_LEN-1] = 0;
+	for(i=0;i<CMD_MSG_LEN-1;i++)
+		cmd_msg[CMD_MSG_LEN-1] += cmd_msg[i];
 }
 
+unsigned char FrameHeaderSearch()
+{
+  unsigned char i=0;
+  while(i+3<packet_buff_size)
+  {
+      if((packet_buff[i] != '#')
+          || (packet_buff[i+1] != 'K')
+          || (packet_buff[i+2] != 'R')
+          || (packet_buff[i+3] != ':'))
+      {
+        i++;
+        continue;
+      }
+
+      break;
+  }
+
+  return i;
+}
+
+//ASCIIå‘½ä»¤è½¬äºŒè¿›åˆ¶å‘½ä»¤
 unsigned char Frame2CmdConvert()
 {
 	unsigned char len;
-	unsigned long var;
-	float fvar;
 
-	len = UART_GetBuff(Uart_buff + Uart_buff_size,15-Uart_buff_size);
-	Uart_buff_size += len;
+//	len = UART_GetBuff(packet_buff + packet_buff_size,ASCII_FRAME_LEN-packet_buff_size);
+//	packet_buff_size += len;
 
-	if(Uart_buff_size < 4)
+	if(packet_buff_size < ASCII_FRAME_LEN)
 		return 0;
 
-	if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'K')
-			&& (Uart_buff[2] == 'R'))
+	if(spi_cmd_send_complete != 1)
+	  return 0;
+
+	len = FrameHeaderSearch();
+	if(len != 0)
 	{
-		if(Uart_buff_size < 10)
-			return 0;
-
-		var = String2Long(Uart_buff+4,6);
-		var /= 32768;
-		freq_modulate = var;
-
-		len = 10;
+	  BuffDel(packet_buff_size - len);
+	  return 0;
 	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'P')
-			&& (Uart_buff[2] == 'W'))
+
+	if(KRParser(packet_buff) == 0)
 	{
-		if(Uart_buff_size < 11)
-			return 0;
-
-		var = String2Long(Uart_buff+4,7);
-		freq_sweep_bw = freq_modulate * var;
-		freq_sweep_bw /= 4;
-
-		fvar = var / clock_scale;
-		fvar = freq_sweep_bw / fvar;
-		var = fvar * step_scale;
-		Format2Cmd(cmd_msg+18,var);
-
-		cmd_msg[22] = 0x00;
-		cmd_msg[23] = 0x01;
-
-		len = 11;
+		packet_buff_size = 0;
+		return 0;
 	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'G')
-			&& (Uart_buff[2] == 'N'))
+
+	if(FreqParser(packet_buff+11) == 0)
 	{
-		if(Uart_buff_size < 6)
-			return 0;
-
-		len = 6;
+		packet_buff_size = 0;
+		return 0;
 	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'R')
-			&& (Uart_buff[2] == 'F'))
+
+	if(PWParser(packet_buff+22) == 0)
 	{
-		if(Uart_buff_size < 5)
-			return 0;
-		if(Uart_buff[4] == '1')
-			cmd_msg[29] |= 0x08;
-		else cmd_msg[29] &= ~0x08;
-		len = 5;
+		packet_buff_size = 0;
+		return 0;
 	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'C')
-			&& (Uart_buff[2] == 'T'))
+
+	if(PRTParser(packet_buff+34) == 0)
 	{
-		if(Uart_buff_size < 10)
-			return 0;
-
-		var = String2Long(Uart_buff+4,6);
-		if(var != 0)
-			cmd_msg[29] |= 0x04;
-		else cmd_msg[29] &= ~0x04;
-
-		fvar = var;
-		fvar /= 10.0;
-		fvar /= clock_scale;
-		fvar *= 1000000.0;
-		var = fvar;
-		Format2Cmd(cmd_msg+37,var);
-
-		len = 10;
+		packet_buff_size = 0;
+		return 0;
 	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'F')
-			&& (Uart_buff[2] == 'R')
-			&& (Uart_buff[3] == 'Q'))
+
+	if(ATTParser(packet_buff+47) == 0)
 	{
-		if(Uart_buff_size < 10)
-			return 0;
+		packet_buff_size = 0;
+		return 0;
+	}
 
-		var = String2Long(Uart_buff+5,5);
-		var -= 13500;
-		var /= 4;
+	if(RFParser(packet_buff+62) == 0)
+	{
+		packet_buff_size = 0;
+		return 0;
+	}
 
-		freq_mid = var;
+	if(MODParser(packet_buff+68) == 0)
+	{
+		packet_buff_size = 0;
+		return 0;
+	}
 
-		len = 10;
-	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'P')
-			&& (Uart_buff[2] == 'R')
-			&& (Uart_buff[3] == 'T'))
+	if(CTParser(packet_buff+75) == 0)
 	{
-		if(Uart_buff_size < 12)
-			return 0;
+		packet_buff_size = 0;
+		return 0;
+	}
 
-		var = String2Long(Uart_buff+5,7);
-		var /= clock_scale;
-		Format2Cmd(cmd_msg+24,var);
-		len = 12;
-	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'M')
-			&& (Uart_buff[2] == 'O')
-			&& (Uart_buff[3] == 'D'))
+	if(AAParser(packet_buff+86,31) == 0)
 	{
-		if(Uart_buff_size < 6)
-			return 0;
+		packet_buff_size = 0;
+		return 0;
+	}
 
-		cmd_msg[29] &= ~0x03;
-		cmd_msg[30] &= ~0x07;
-		if(Uart_buff[5] == '1')
-		{
-			cmd_msg[29] |= 0x01;
-			cmd_msg[30] |= 0x01;
-		}
-		else if(Uart_buff[5] == '2')
-		{
-			cmd_msg[29] |= 0x03;
-			cmd_msg[30] |= 0x03;
-		}
-		else if(Uart_buff[5] == '3')
-		{
-			cmd_msg[29] |= 0x01;
-			cmd_msg[30] |= 0x03;
-		}
-		else if(Uart_buff[5] == '4')
-		{
-			cmd_msg[29] |= 0x01;
-			cmd_msg[30] |= 0x07;
-		}
-		len = 6;
-	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'A')
-			&& (Uart_buff[2] == 'T')
-			&& (Uart_buff[3] == 'T'))
+	if(PSParser(packet_buff+94,34) == 0)
 	{
-		if(Uart_buff_size < 7)
-			return 0;
-		var = String2Long(Uart_buff+5,2);
-		var = (var << 1);
-		cmd_msg[28] = var;
-		cmd_msg[28] = ~cmd_msg[28];
+		packet_buff_size = 0;
+		return 0;
+	}
 
-		len = 7;
-	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'A')
-			&& (Uart_buff[2] == 'A')
-			&& (Uart_buff[3] == 'A'))
+	if(AAParser(packet_buff+102,32) == 0)
 	{
-		if(Uart_buff_size < 7)
-			return 0;
-		var = String2Long(Uart_buff+5,2);
-		var = ~var;
-		cmd_msg[31] = 0;
-		cmd_msg[31] |= (var & 0x01)<<5;
-		cmd_msg[31] |= (var & 0x02)<<3;
-		cmd_msg[31] |= (var & 0x04)<<1;
-		cmd_msg[31] |= (var & 0x08)>>1;
-		cmd_msg[31] |= (var & 0x10)>>3;
-		cmd_msg[31] |= (var & 0x20)>>5;
-		len = 7;
+		packet_buff_size = 0;
+		return 0;
 	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'P')
-			&& (Uart_buff[2] == 'S')
-			&& (Uart_buff[3] == 'A'))
-	{
-		if(Uart_buff_size < 7)
-			return 0;
-		var = String2Long(Uart_buff+5,2);
-		cmd_msg[34] = var;
-		len = 7;
-	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'A')
-			&& (Uart_buff[2] == 'A')
-			&& (Uart_buff[3] == 'B'))
-	{
-		if(Uart_buff_size < 7)
-			return 0;
-		var = String2Long(Uart_buff+5,2);
-		var = ~var;
-		cmd_msg[32] = 0;
-		cmd_msg[32] |= (var & 0x01)<<5;
-		cmd_msg[32] |= (var & 0x02)<<3;
-		cmd_msg[32] |= (var & 0x04)<<1;
-		cmd_msg[32] |= (var & 0x08)>>1;
-		cmd_msg[32] |= (var & 0x10)>>3;
-		cmd_msg[32] |= (var & 0x20)>>5;
-		len = 7;
-	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'P')
-			&& (Uart_buff[2] == 'S')
-			&& (Uart_buff[3] == 'B'))
-	{
-		if(Uart_buff_size < 7)
-			return 0;
-		var = String2Long(Uart_buff+5,2);
-		cmd_msg[35] = var;
-		len = 7;
-	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'A')
-			&& (Uart_buff[2] == 'A')
-			&& (Uart_buff[3] == 'C'))
-	{
-		if(Uart_buff_size < 7)
-			return 0;
-		var = String2Long(Uart_buff+5,2);
-		var = ~var;
-		cmd_msg[33] = 0;
-		cmd_msg[33] |= (var & 0x01)<<5;
-		cmd_msg[33] |= (var & 0x02)<<3;
-		cmd_msg[33] |= (var & 0x04)<<1;
-		cmd_msg[33] |= (var & 0x08)>>1;
-		cmd_msg[33] |= (var & 0x10)>>3;
-		cmd_msg[33] |= (var & 0x20)>>5;
-		len = 7;
-	}
-	else if((Uart_buff[0] == '#')
-			&& (Uart_buff[1] == 'P')
-			&& (Uart_buff[2] == 'S')
-			&& (Uart_buff[3] == 'C'))
-	{
-		if(Uart_buff_size < 7)
-			return 0;
-		var = String2Long(Uart_buff+5,2);
-		cmd_msg[36] = var;
-		len = 7;
 
-		FTWGen(freq_mid);
-		CmdCrcCalc();
-		BuffDel(len);
-		return 1;
+	if(PSParser(packet_buff+110,35) == 0)
+	{
+		packet_buff_size = 0;
+		return 0;
 	}
-	else len = 1;
 
-	BuffDel(len);
+	if(AAParser(packet_buff+118,33) == 0)
+	{
+		packet_buff_size = 0;
+		return 0;
+	}
 
-	return 0;
+	if(PSParser(packet_buff+126,36) == 0)
+	{
+		packet_buff_size = 0;
+		return 0;
+	}
+
+	if(YSParser(packet_buff+140) == 0)
+	{
+		packet_buff_size = 0;
+		return 0;
+	}
+
+	packet_buff_size = 0;
+
+  FTWGen(freq_mid,cmd_msg+2);
+  FTWGen(freq_mid+2.5,cmd_msg+10);
+  CmdCrcCalc();
+
+  cmd_msg_valid = 1;
+	return 1;
 }
 
+unsigned char KRParser(unsigned char* buf)
+{
+  unsigned long var;
+
+  if((buf[0] != '#')
+        || (buf[1] != 'K')
+        || (buf[2] != 'R')
+        || (buf[3] != ':')
+        || (buf[10] != ';'))
+    return 0;
+
+  var = String2Long(buf+4,6);
+  var /= 32768;
+  freq_modulate = var;
+
+  return 1;
+}
+
+unsigned char FreqParser(unsigned char* buf)
+{
+  unsigned long var;
+
+  if((buf[0] != '#')
+          || (buf[1] != 'F')
+          || (buf[2] != 'R')
+          || (buf[3] != 'Q')
+          || (buf[4] != ':')
+          || (buf[10] != ';'))
+    return 0;
+
+  var = String2Long(buf+5,5);
+  var -= 13500;
+  var /= 4;
+
+  freq_mid = var;
+  return 1;
+}
+
+unsigned char PWParser(unsigned char* buf)
+{
+	unsigned long var;
+	double fvar;
+
+	if((buf[0] != '#')
+		|| (buf[1] != 'P')
+		|| (buf[2] != 'W')
+		|| (buf[3] != ':')
+		|| (buf[11] != ';'))
+		return 0;
+
+	var = String2Long(buf+4,7);
+	Format2Cmd(cmd_msg+24,var,2);
+
+	freq_sweep_bw = freq_modulate * var;
+	freq_sweep_bw /= 4;
+
+	fvar = var / clock_scale;
+	fvar = freq_sweep_bw / fvar;
+	var = fvar * step_scale;
+	Format2Cmd(cmd_msg+18,var,4);
+
+	cmd_msg[22] = 0x00;
+	cmd_msg[23] = 0x01;
+
+	return 1;
+}
+
+unsigned char PRTParser(unsigned char * buf)
+{
+	unsigned long var;
+
+	if((buf[0] != '#')
+			|| (buf[1] != 'P')
+			|| (buf[2] != 'R')
+			|| (buf[3] != 'T')
+			|| (buf[4] != ':')
+			|| (buf[12] != ';'))
+		return 0;
+
+  var = String2Long(buf+5,7);
+  //var /= clock_scale;
+  Format2Cmd(cmd_msg+26,var,3);
+
+  return 1;
+}
+
+unsigned char ATTParser(unsigned char* buf)
+{
+	unsigned long var;
+
+	if((buf[0] != '#')
+	      || (buf[1] != 'A')
+	      || (buf[2] != 'T')
+	      || (buf[3] != 'T')
+	      || (buf[4] != ':')
+	      || (buf[7] != ';'))
+		return 0;
+
+
+  var = String2Long(buf+5,2);
+  var = (var << 1);
+  cmd_msg[29] = var+13;
+  cmd_msg[29] = ~cmd_msg[29];
+
+  return 1;
+}
+
+unsigned char RFParser(unsigned char* buf)
+{
+	if((buf[0] != '#')
+			|| (buf[1] != 'R')
+			|| (buf[2] != 'F')
+			|| (buf[3] != ':')
+			|| (buf[5] != ';'))
+		return 0;
+
+	if(buf[4] == '1')
+		cmd_msg[30] |= 0x08;
+	else cmd_msg[30] &= ~0x08;
+
+	return 1;
+}
+
+unsigned char MODParser(unsigned char* buf)
+{
+	if((buf[0] != '#')
+	      || (buf[1] != 'M')
+	      || (buf[2] != 'O')
+	      || (buf[3] != 'D')
+	      || (buf[4] != ':')
+	      || (buf[6] != ';'))
+		  return 0;
+
+  cmd_msg[30] &= ~0x07;
+  if(buf[5] == '1')
+  {
+    cmd_msg[30] |= 0x01;//ä¸€å‘ä¸€æ”¶tv
+  }
+  else if(buf[5] == '2')
+  {
+    cmd_msg[30] |= 0x02;//ä¸€å‘ä¸¤æ”¶tr/tv
+  }
+  else if(buf[5] == '3')
+  {
+    cmd_msg[30] |= 0x03;//ä¸€å‘ä¸¤æ”¶tr+tv
+  }
+  else if(buf[5] == '4')
+  {
+    cmd_msg[30] |= 0x04;//ä¸€å‘ä¸‰æ”¶
+  }
+
+  return 1;
+}
+
+unsigned char CTParser(unsigned char* buf)
+{
+	unsigned long var;
+	//double fvar;
+
+	if((buf[0] != '#')
+			|| (buf[1] != 'C')
+			|| (buf[2] != 'T')
+			|| (buf[3] != ':')
+			|| (buf[10] != ';'))
+		return 0;
+
+	var = String2Long(buf+4,6);
+	var *= 100;
+	Format2Cmd(cmd_msg+37,var,4);
+
+	return 1;
+}
+
+unsigned char AAParser(unsigned char* buf,unsigned char index)
+{
+	unsigned long var;
+
+	if((buf[0] != '#')
+			|| (buf[1] != 'A')
+			|| (buf[2] != 'A')
+			/*|| (buf[3] != 'A')*/
+			|| (buf[4] != ':')
+			|| (buf[7] != ';'))
+		return 0;
+
+	var = String2Long(buf+5,2);
+//	var = ~var;
+//	cmd_msg[index] = 0;
+//	cmd_msg[index] |= (var & 0x01)<<5;
+//	cmd_msg[index] |= (var & 0x02)<<3;
+//	cmd_msg[index] |= (var & 0x04)<<1;
+//	cmd_msg[index] |= (var & 0x08)>>1;
+//	cmd_msg[index] |= (var & 0x10)>>3;
+//	cmd_msg[index] |= (var & 0x20)>>5;
+	cmd_msg[index] = var * 5.625;
+
+	return 1;
+}
+
+unsigned char PSParser(unsigned char* buf,unsigned char index)
+{
+	unsigned long var;
+
+	if((buf[0] != '#')
+			|| (buf[1] != 'P')
+			|| (buf[2] != 'S')
+			/*|| (buf[3] != 'A')*/
+			|| (buf[4] != ':')
+			|| (buf[7] != ';'))
+		return 0;
+
+	var = String2Long(buf+5,2);
+	cmd_msg[index] = var;
+
+	return 1;
+}
+
+unsigned char YSParser(unsigned char* buf)
+{
+	unsigned long var;
+	//double fvar;
+
+	if((buf[0] != '#')
+	        || (buf[1] != 'Y')
+	        || (buf[2] != 'S')
+	        || (buf[3] != ':')
+	        || (buf[6] != ';'))
+		return 0;
+
+  var = String2Long(buf+4,2);
+//  fvar = var;
+//  fvar /= clock_scale;
+//  var = fvar;
+  Format2Cmd(cmd_msg+41,var,4);
+
+  return 1;
+}
 
 

@@ -1,14 +1,14 @@
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        03/19/20 17:00:44 PAGE     1
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        11/11/20 22:43:56 PAGE     1
 
 
 MACRO ASSEMBLER AX51 V3.15.3.0
 OBJECT MODULE PLACED IN .\src\SILABS_STARTUP.OBJ
-ASSEMBLER INVOKED BY: d:\SiliconLabs\SimplicityStudio\v4\developer\toolchains\keil_8051\9.60\BIN\AX51.exe D:\SiliconLabs
-                      \SimplicityStudio\v4\developer\sdks\8051\v4.1.7\Device\shared\si8051Base\SILABS_STARTUP.A51 ERRORP
-                      RINT SET(SMALL,SILABS_STARTUP=1) DEBUG MACRO NOMOD51 INCDIR(D:/SiliconLabs/SimplicityStudio/v4/dev
-                      eloper/sdks/8051/v4.1.7//Device/shared/si8051Base;D:/SiliconLabs/SimplicityStudio/v4/developer/sdk
-                      s/8051/v4.1.7//Device/C8051F310/inc) PRINT(.\src\SILABS_STARTUP.lst) COND SYMBOLS PAGEWIDTH(120) P
-                      AGELENGTH(65) OBJECT(.\src\SILABS_STARTUP.OBJ) 
+ASSEMBLER INVOKED BY: d:\SiliconLabs\SimplicityStudio\v5\developer\toolchains\keil_8051\9.60\BIN\AX51.exe D:\SiliconLabs
+                      \SimplicityStudio\v5\developer\sdks\8051\v4.1.7\Device\shared\si8051Base\SILABS_STARTUP.A51 ERRORP
+                      RINT SET(COMPACT,SILABS_STARTUP=1) DEBUG MACRO NOMOD51 INCDIR(D:/SiliconLabs/SimplicityStudio/v5/d
+                      eveloper/sdks/8051/v4.1.7//Device/shared/si8051Base;D:/SiliconLabs/SimplicityStudio/v5/developer/s
+                      dks/8051/v4.1.7//Device/C8051F310/inc) PRINT(.\src\SILABS_STARTUP.lst) COND SYMBOLS PAGEWIDTH(120)
+                       PAGELENGTH(65) OBJECT(.\src\SILABS_STARTUP.OBJ) 
 
 LOC    OBJ             LINE     SOURCE
 
@@ -62,7 +62,7 @@ LOC    OBJ             LINE     SOURCE
                          48     ;</h>
                          49     ;------------------------------------------------------------------------------
                          50     ;
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        03/19/20 17:00:44 PAGE     2
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        11/11/20 22:43:56 PAGE     2
 
                          51     ;<h> Reentrant Stack Initialization
                          52     ;
@@ -127,7 +127,7 @@ LOC    OBJ             LINE     SOURCE
  0083                   111     DPH     DATA    83H
                         112     
                         113                     NAME    ?C_STARTUP
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        03/19/20 17:00:44 PAGE     3
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        11/11/20 22:43:56 PAGE     3
 
                         114     
                         115     
@@ -192,7 +192,7 @@ LOC    OBJ             LINE     SOURCE
                                 
                                                 MOV     ?C_IBP,#LOW IBPSTACKTOP
                                 ENDIF
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        03/19/20 17:00:44 PAGE     4
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        11/11/20 22:43:56 PAGE     4
 
                         177     
                         178     IF XBPSTACK <> 0
@@ -222,7 +222,7 @@ LOC    OBJ             LINE     SOURCE
 00000C 020000     E     201                     LJMP    ?C_START
                         202     
                         203                     END
-AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        03/19/20 17:00:44 PAGE     5
+AX51 MACRO ASSEMBLER  SILABS_STARTUP                                                        11/11/20 22:43:56 PAGE     5
 
 SYMBOL TABLE LISTING
 ------ ----- -------

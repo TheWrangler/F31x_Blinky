@@ -1,16 +1,19 @@
 /*
  * sta.h
  *
- *  Created on: 2020Äê1ÔÂ27ÈÕ
+ *  Created on: 2020ï¿½ï¿½1ï¿½ï¿½27ï¿½ï¿½
  *      Author: wrangler
  */
 
 #ifndef STA_H_
 #define STA_H_
 
+#define STA_MSG_LEN 175
+
 unsigned char Float_Format(float var,unsigned char* pBuf);
 void Teamperature_Convert(unsigned int adc_var);
 void Bite_Convert(unsigned int adc_var);
-void State_Msg();
+void UpdateFrame();
+void UpdateSta();
 
 #endif /* STA_H_ */

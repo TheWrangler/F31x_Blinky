@@ -22,10 +22,10 @@ OBJS += \
 	@echo 'Finished building: $<'
 	@echo ' '
 
-F31x_Blinky.OBJ: D:/SiliconLabs/SimplicityStudio/v4/developer/sdks/8051/v4.1.7/Device/C8051F310/inc/SI_C8051F310_Register_Enums.h F:/simplicity_studo_workspace/F31x_Blinky/src/timer.h F:/simplicity_studo_workspace/F31x_Blinky/src/uart.h F:/simplicity_studo_workspace/F31x_Blinky/src/spi.h F:/simplicity_studo_workspace/F31x_Blinky/src/adc.h F:/simplicity_studo_workspace/F31x_Blinky/src/sys.h F:/simplicity_studo_workspace/F31x_Blinky/sta.h F:/simplicity_studo_workspace/F31x_Blinky/cmd.h D:/SiliconLabs/SimplicityStudio/v4/developer/sdks/8051/v4.1.7/Device/C8051F310/inc/SI_C8051F310_Defs.h D:/SiliconLabs/SimplicityStudio/v4/developer/sdks/8051/v4.1.7/Device/shared/si8051Base/si_toolchain.h D:/SiliconLabs/SimplicityStudio/v4/developer/sdks/8051/v4.1.7/Device/shared/si8051Base/stdint.h D:/SiliconLabs/SimplicityStudio/v4/developer/sdks/8051/v4.1.7/Device/shared/si8051Base/stdbool.h
+F31x_Blinky.OBJ: D:/SiliconLabs/SimplicityStudio/v5/developer/sdks/8051/v4.1.7/Device/C8051F310/inc/SI_C8051F310_Register_Enums.h F:/simplicity_studo_workspace_v5/F31x_Blinky/src/timer.h F:/simplicity_studo_workspace_v5/F31x_Blinky/src/uart.h F:/simplicity_studo_workspace_v5/F31x_Blinky/src/spi.h F:/simplicity_studo_workspace_v5/F31x_Blinky/src/adc.h F:/simplicity_studo_workspace_v5/F31x_Blinky/src/sys.h F:/simplicity_studo_workspace_v5/F31x_Blinky/sta.h F:/simplicity_studo_workspace_v5/F31x_Blinky/cmd.h D:/SiliconLabs/SimplicityStudio/v5/developer/sdks/8051/v4.1.7/Device/C8051F310/inc/SI_C8051F310_Defs.h D:/SiliconLabs/SimplicityStudio/v5/developer/sdks/8051/v4.1.7/Device/shared/si8051Base/si_toolchain.h D:/SiliconLabs/SimplicityStudio/v5/developer/sdks/8051/v4.1.7/Device/shared/si8051Base/stdint.h D:/SiliconLabs/SimplicityStudio/v5/developer/sdks/8051/v4.1.7/Device/shared/si8051Base/stdbool.h
 
-cmd.OBJ: F:/simplicity_studo_workspace/F31x_Blinky/src/uart.h F:/simplicity_studo_workspace/F31x_Blinky/cmd.h
+cmd.OBJ: F:/simplicity_studo_workspace_v5/F31x_Blinky/src/uart.h F:/simplicity_studo_workspace_v5/F31x_Blinky/cmd.h
 
-sta.OBJ: F:/simplicity_studo_workspace/F31x_Blinky/sta.h
+sta.OBJ: F:/simplicity_studo_workspace_v5/F31x_Blinky/sta.h F:/simplicity_studo_workspace_v5/F31x_Blinky/cmd.h
 
 

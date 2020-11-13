@@ -12,7 +12,7 @@
 #include "cmd.h"
 
 extern unsigned char sta_msg_send_complete;
-extern unsigned char sta_cmd_send_complete;
+extern unsigned char cmd_msg_valid;
 
 //-----------------------------------------------------------------------------
 // SiLabs_Startup() Routine
@@ -39,6 +39,7 @@ void main (void)
 
 	while(1)
 	{
+	  ADC_Start(adc_target);
 		if(ADC_Get(&adc_var) == 1)
 		{
 			if(adc_target == 0)
@@ -53,15 +54,27 @@ void main (void)
 			}
 		}
 
-		if(sta_msg_send_complete == 1)
+//		if(Frame2CmdConvert() == 1)
+//		{
+//      if(sta_msg_send_complete == 1)
+//        UpdateFrame();
+//		}
+
+		UART_GetBuff();
+
+		if(cmd_msg_valid == 1)
 		{
-			State_Msg();
-			UART_Send();
-		}
+      SPI_Send();
+      cmd_msg_valid = 0;
+    }
 
-		if((Frame2CmdConvert() == 1) && (sta_cmd_send_complete == 1))
-			SPI_Send();
+		if(sta_msg_send_complete == 1)
+    {
+		  if(Frame2CmdConvert() == 1)
+		    UpdateFrame();
 
-		ADC_Start(adc_target);
+      UpdateSta();
+      UART_Send();
+    }
 	}
 }

@@ -4,6 +4,7 @@
 
 A51_UPPER_SRCS := 
 OBJ_UPPER_SRCS := 
+S79_SRCS := 
 SRC_UPPER_SRCS := 
 ASM_SRCS := 
 C_SRCS := 
@@ -14,7 +15,5 @@ OBJS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 . \
-Keil\ 8051\ v9.0.0\ -\ Debug \
-Keil\ 8051\ v9.0.0\ -\ Debug/src \
 src \
 
