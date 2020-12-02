@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       11/13/2020 10:10:45 PAGE 1   
+C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       12/02/2020 17:39:16 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE F31X_BLINKY
@@ -63,7 +63,7 @@ line level    source
   50   2      
   51   2                      UART_GetBuff();
   52   2      
-C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       11/13/2020 10:10:45 PAGE 2   
+C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       12/02/2020 17:39:16 PAGE 2   
 
   53   2                      if(cmd_msg_valid == 1)
   54   2                      {

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 1   
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE CMD
@@ -63,7 +63,7 @@ line level    source
   50   2                      {
   51   3                              x /= 2;
   52   3                              y /= 2;
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 2   
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 2   
 
   53   3                              gcdNum *= 2;
   54   3                      }
@@ -128,7 +128,7 @@ line level    source
  113   1              ftw = freq_sweep_bw >> 1;
  114   1              ftw = freq - ftw;
  115   1              div = gcd(ftw,3400);
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 3   
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 3   
 
  116   1              m = ftw / div;
  117   1              n = 3400 / div;
@@ -193,7 +193,7 @@ line level    source
  176   1        return i;
  177   1      }
  178          
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 4   
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 4   
 
  179          //ASCII命令转二进制命令
  180          unsigned char Frame2CmdConvert()
@@ -258,7 +258,7 @@ line level    source
  239   2                      return 0;
  240   2              }
  241   1      
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 5   
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 5   
 
  242   1              if(CTParser(packet_buff+75) == 0)
  243   1              {
@@ -323,7 +323,7 @@ line level    source
  302   1        unsigned long var;
  303   1      
  304   1        if((buf[0] != '#')
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 6   
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 6   
 
  305   1              || (buf[1] != 'K')
  306   1              || (buf[2] != 'R')
@@ -388,7 +388,7 @@ line level    source
  365   1      }
  366          
  367          unsigned char PRTParser(unsigned char * buf)
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 7   
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 7   
 
  368          {
  369   1              unsigned long var;
@@ -422,162 +422,169 @@ line level    source
  397   1      
  398   1      
  399   1        var = String2Long(buf+5,2);
- 400   1        var = (var << 1);
- 401   1        cmd_msg[29] = var+13;
- 402   1        cmd_msg[29] = ~cmd_msg[29];
- 403   1      
- 404   1        return 1;
- 405   1      }
- 406          
- 407          unsigned char RFParser(unsigned char* buf)
- 408          {
- 409   1              if((buf[0] != '#')
- 410   1                              || (buf[1] != 'R')
- 411   1                              || (buf[2] != 'F')
- 412   1                              || (buf[3] != ':')
- 413   1                              || (buf[5] != ';'))
- 414   1                      return 0;
- 415   1      
- 416   1              if(buf[4] == '1')
- 417   1                      cmd_msg[30] |= 0x08;
- 418   1              else cmd_msg[30] &= ~0x08;
- 419   1      
- 420   1              return 1;
- 421   1      }
- 422          
- 423          unsigned char MODParser(unsigned char* buf)
- 424          {
- 425   1              if((buf[0] != '#')
- 426   1                    || (buf[1] != 'M')
- 427   1                    || (buf[2] != 'O')
- 428   1                    || (buf[3] != 'D')
- 429   1                    || (buf[4] != ':')
- 430   1                    || (buf[6] != ';'))
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 8   
+ 400   1        if(var > 18)
+ 401   1          var = 18;
+ 402   1        if(var != 0)
+ 403   1          var += 13;
+ 404   1      
+ 405   1        var = (var << 1);
+ 406   1      
+ 407   1        cmd_msg[29] = var;
+ 408   1        cmd_msg[29] = ~cmd_msg[29];
+ 409   1        return 1;
+ 410   1      }
+ 411          
+ 412          unsigned char RFParser(unsigned char* buf)
+ 413          {
+ 414   1              if((buf[0] != '#')
+ 415   1                              || (buf[1] != 'R')
+ 416   1                              || (buf[2] != 'F')
+ 417   1                              || (buf[3] != ':')
+ 418   1                              || (buf[5] != ';'))
+ 419   1                      return 0;
+ 420   1      
+ 421   1              if(buf[4] == '1')
+ 422   1                      cmd_msg[30] |= 0x08;
+ 423   1              else cmd_msg[30] &= ~0x08;
+ 424   1      
+ 425   1              return 1;
+ 426   1      }
+ 427          
+ 428          unsigned char MODParser(unsigned char* buf)
+ 429          {
+ 430   1              if((buf[0] != '#')
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 8   
 
- 431   1                        return 0;
- 432   1      
- 433   1        cmd_msg[30] &= ~0x07;
- 434   1        if(buf[5] == '1')
- 435   1        {
- 436   2          cmd_msg[30] |= 0x01;//一发一收tv
- 437   2        }
- 438   1        else if(buf[5] == '2')
- 439   1        {
- 440   2          cmd_msg[30] |= 0x02;//一发两收tr/tv
- 441   2        }
- 442   1        else if(buf[5] == '3')
- 443   1        {
- 444   2          cmd_msg[30] |= 0x03;//一发两收tr+tv
- 445   2        }
- 446   1        else if(buf[5] == '4')
- 447   1        {
- 448   2          cmd_msg[30] |= 0x04;//一发三收
- 449   2        }
- 450   1      
- 451   1        return 1;
- 452   1      }
- 453          
- 454          unsigned char CTParser(unsigned char* buf)
- 455          {
- 456   1              unsigned long var;
- 457   1              //double fvar;
- 458   1      
- 459   1              if((buf[0] != '#')
- 460   1                              || (buf[1] != 'C')
- 461   1                              || (buf[2] != 'T')
- 462   1                              || (buf[3] != ':')
- 463   1                              || (buf[10] != ';'))
- 464   1                      return 0;
- 465   1      
- 466   1              var = String2Long(buf+4,6);
- 467   1              var *= 100;
- 468   1              Format2Cmd(cmd_msg+37,var,4);
- 469   1      
- 470   1              return 1;
- 471   1      }
- 472          
- 473          unsigned char AAParser(unsigned char* buf,unsigned char index)
- 474          {
- 475   1              unsigned long var;
- 476   1      
- 477   1              if((buf[0] != '#')
- 478   1                              || (buf[1] != 'A')
- 479   1                              || (buf[2] != 'A')
- 480   1                              /*|| (buf[3] != 'A')*/
- 481   1                              || (buf[4] != ':')
- 482   1                              || (buf[7] != ';'))
- 483   1                      return 0;
- 484   1      
- 485   1              var = String2Long(buf+5,2);
- 486   1      //      var = ~var;
- 487   1      //      cmd_msg[index] = 0;
- 488   1      //      cmd_msg[index] |= (var & 0x01)<<5;
- 489   1      //      cmd_msg[index] |= (var & 0x02)<<3;
- 490   1      //      cmd_msg[index] |= (var & 0x04)<<1;
- 491   1      //      cmd_msg[index] |= (var & 0x08)>>1;
- 492   1      //      cmd_msg[index] |= (var & 0x10)>>3;
- 493   1      //      cmd_msg[index] |= (var & 0x20)>>5;
-C51 COMPILER V9.60.0.0   CMD                                                               11/13/2020 21:48:51 PAGE 9   
+ 431   1                    || (buf[1] != 'M')
+ 432   1                    || (buf[2] != 'O')
+ 433   1                    || (buf[3] != 'D')
+ 434   1                    || (buf[4] != ':')
+ 435   1                    || (buf[6] != ';'))
+ 436   1                        return 0;
+ 437   1      
+ 438   1        cmd_msg[30] &= ~0x07;
+ 439   1        if(buf[5] == '1')
+ 440   1        {
+ 441   2          cmd_msg[30] |= 0x01;//一发一收tv
+ 442   2        }
+ 443   1        else if(buf[5] == '2')
+ 444   1        {
+ 445   2          cmd_msg[30] |= 0x02;//一发两收tr/tv
+ 446   2        }
+ 447   1        else if(buf[5] == '3')
+ 448   1        {
+ 449   2          cmd_msg[30] |= 0x03;//一发两收tr+tv
+ 450   2        }
+ 451   1        else if(buf[5] == '4')
+ 452   1        {
+ 453   2          cmd_msg[30] |= 0x04;//一发三收
+ 454   2        }
+ 455   1      
+ 456   1        return 1;
+ 457   1      }
+ 458          
+ 459          unsigned char CTParser(unsigned char* buf)
+ 460          {
+ 461   1              unsigned long var;
+ 462   1              //double fvar;
+ 463   1      
+ 464   1              if((buf[0] != '#')
+ 465   1                              || (buf[1] != 'C')
+ 466   1                              || (buf[2] != 'T')
+ 467   1                              || (buf[3] != ':')
+ 468   1                              || (buf[10] != ';'))
+ 469   1                      return 0;
+ 470   1      
+ 471   1              var = String2Long(buf+4,6);
+ 472   1              var *= 100;
+ 473   1              Format2Cmd(cmd_msg+37,var,4);
+ 474   1      
+ 475   1              return 1;
+ 476   1      }
+ 477          
+ 478          unsigned char AAParser(unsigned char* buf,unsigned char index)
+ 479          {
+ 480   1              unsigned long var;
+ 481   1      
+ 482   1              if((buf[0] != '#')
+ 483   1                              || (buf[1] != 'A')
+ 484   1                              || (buf[2] != 'A')
+ 485   1                              /*|| (buf[3] != 'A')*/
+ 486   1                              || (buf[4] != ':')
+ 487   1                              || (buf[7] != ';'))
+ 488   1                      return 0;
+ 489   1      
+ 490   1              var = String2Long(buf+5,2);
+ 491   1      //      var = ~var;
+ 492   1      //      cmd_msg[index] = 0;
+ 493   1      //      cmd_msg[index] |= (var & 0x01)<<5;
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 9   
 
- 494   1              cmd_msg[index] = var;
- 495   1      
- 496   1              return 1;
- 497   1      }
- 498          
- 499          unsigned char PSParser(unsigned char* buf,unsigned char index)
- 500          {
- 501   1              unsigned long var;
- 502   1      
- 503   1              if((buf[0] != '#')
- 504   1                              || (buf[1] != 'P')
- 505   1                              || (buf[2] != 'S')
- 506   1                              /*|| (buf[3] != 'A')*/
- 507   1                              || (buf[4] != ':')
- 508   1                              || (buf[7] != ';'))
- 509   1                      return 0;
- 510   1      
- 511   1              var = String2Long(buf+5,2);
- 512   1              cmd_msg[index] = var;
- 513   1      
- 514   1              return 1;
- 515   1      }
- 516          
- 517          unsigned char YSParser(unsigned char* buf)
- 518          {
- 519   1              unsigned long var;
- 520   1              //double fvar;
- 521   1      
- 522   1              if((buf[0] != '#')
- 523   1                      || (buf[1] != 'Y')
- 524   1                      || (buf[2] != 'S')
- 525   1                      || (buf[3] != ':')
- 526   1                      || (buf[6] != ';'))
- 527   1                      return 0;
- 528   1      
- 529   1        var = String2Long(buf+4,2);
- 530   1      //  fvar = var;
- 531   1      //  fvar /= clock_scale;
- 532   1      //  var = fvar;
- 533   1        Format2Cmd(cmd_msg+41,var,4);
- 534   1      
- 535   1        return 1;
- 536   1      }
- 537          
- 538          
+ 494   1      //      cmd_msg[index] |= (var & 0x02)<<3;
+ 495   1      //      cmd_msg[index] |= (var & 0x04)<<1;
+ 496   1      //      cmd_msg[index] |= (var & 0x08)>>1;
+ 497   1      //      cmd_msg[index] |= (var & 0x10)>>3;
+ 498   1      //      cmd_msg[index] |= (var & 0x20)>>5;
+ 499   1              cmd_msg[index] = var;
+ 500   1      
+ 501   1              return 1;
+ 502   1      }
+ 503          
+ 504          unsigned char PSParser(unsigned char* buf,unsigned char index)
+ 505          {
+ 506   1              unsigned long var;
+ 507   1      
+ 508   1              if((buf[0] != '#')
+ 509   1                              || (buf[1] != 'P')
+ 510   1                              || (buf[2] != 'S')
+ 511   1                              /*|| (buf[3] != 'A')*/
+ 512   1                              || (buf[4] != ':')
+ 513   1                              || (buf[7] != ';'))
+ 514   1                      return 0;
+ 515   1      
+ 516   1              var = String2Long(buf+5,2);
+ 517   1              cmd_msg[index] = var;
+ 518   1      
+ 519   1              return 1;
+ 520   1      }
+ 521          
+ 522          unsigned char YSParser(unsigned char* buf)
+ 523          {
+ 524   1              unsigned long var;
+ 525   1              //double fvar;
+ 526   1      
+ 527   1              if((buf[0] != '#')
+ 528   1                      || (buf[1] != 'Y')
+ 529   1                      || (buf[2] != 'S')
+ 530   1                      || (buf[3] != ':')
+ 531   1                      || (buf[6] != ';'))
+ 532   1                      return 0;
+ 533   1      
+ 534   1        var = String2Long(buf+4,2);
+ 535   1      //  fvar = var;
+ 536   1      //  fvar /= clock_scale;
+ 537   1      //  var = fvar;
+ 538   1        Format2Cmd(cmd_msg+41,var,4);
+ 539   1      
+ 540   1        return 1;
+ 541   1      }
+ 542          
+ 543          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   3211    ----
+   CODE SIZE        =   3326    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
-   PDATA SIZE       =    169      86
+   PDATA SIZE       =    169      90
    DATA SIZE        =   ----    ----
    IDATA SIZE       =     46    ----
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----
    HDATA SIZE       =   ----    ----
    XDATA CONST SIZE =   ----    ----
+C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 10  
+
    FAR CONST SIZE   =   ----    ----
 END OF MODULE INFORMATION.
 

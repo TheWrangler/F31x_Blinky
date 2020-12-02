@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   STA                                                               11/13/2020 21:48:51 PAGE 1   
+C51 COMPILER V9.60.0.0   STA                                                               12/02/2020 17:39:16 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE STA
@@ -63,7 +63,7 @@ line level    source
   50   1              byte = var;
   51   1              pBuf[index] = byte + 0x30;
   52   1              index++;
-C51 COMPILER V9.60.0.0   STA                                                               11/13/2020 21:48:51 PAGE 2   
+C51 COMPILER V9.60.0.0   STA                                                               12/02/2020 17:39:16 PAGE 2   
 
   53   1      
   54   1              //.
@@ -128,7 +128,7 @@ line level    source
  113   1      
  114   1        len = Float_Format(bite,sta_msg+sta_msg_len);
  115   1        sta_msg_len += len;
-C51 COMPILER V9.60.0.0   STA                                                               11/13/2020 21:48:51 PAGE 3   
+C51 COMPILER V9.60.0.0   STA                                                               12/02/2020 17:39:16 PAGE 3   
 
  116   1      
  117   1        sta_msg[sta_msg_len++] = ';';

@@ -397,10 +397,15 @@ unsigned char ATTParser(unsigned char* buf)
 
 
   var = String2Long(buf+5,2);
-  var = (var << 1);
-  cmd_msg[29] = var+13;
-  cmd_msg[29] = ~cmd_msg[29];
+  if(var > 18)
+    var = 18;
+  if(var != 0)
+    var += 13;
 
+  var = (var << 1);
+
+  cmd_msg[29] = var;
+  cmd_msg[29] = ~cmd_msg[29];
   return 1;
 }
 
