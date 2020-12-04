@@ -8,7 +8,7 @@
 #ifndef UART_H_
 #define UART_H_
 
-#define UART_RECV_BUF_NUM 10
+#define UART_RECV_BUF_NUM 20
 
 void UART_Init();
 void UART_Send();

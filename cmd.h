@@ -14,7 +14,7 @@
 unsigned long gcd(unsigned long x, unsigned long y);
 unsigned long String2Long(unsigned char* buf,unsigned char dec);
 void Format2Cmd(unsigned char* cmd,unsigned long var,unsigned char byte_width);
-void FTWGen(unsigned long freq,unsigned char* cmd_msg);
+void FTWGen(double freq,unsigned char* cmd_msg);
 void BuffDel(unsigned char len);
 void CmdCrcCalc();
 unsigned char Frame2CmdConvert();

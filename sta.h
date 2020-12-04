@@ -12,7 +12,7 @@
 
 unsigned char Float_Format(float var,unsigned char* pBuf);
 void Teamperature_Convert(unsigned int adc_var);
-void Bite_Convert(unsigned int adc_var);
+//void Bite_Convert(unsigned int adc_var);
 void UpdateFrame();
 void UpdateSta();
 

@@ -1,7 +1,7 @@
 /*
  * sys.c
  *
- *  Created on: 2020Äê1ÔÂ23ÈÕ
+ *  Created on: 2020ï¿½ï¿½1ï¿½ï¿½23ï¿½ï¿½
  *      Author: wrangler
  */
 #include <SI_C8051F310_Register_Enums.h>
@@ -38,6 +38,8 @@ void Port_IO_Init()
     // P2.3  -  NSS  (SPI0), Open-Drain, Digital
 
 	P0MDOUT  |= 0x10;      // Enable UTX as push-pull output
+	P1MDOUT  |= 0x0E;
+	P1 &= ~0x0e;
 	P2MDOUT  |= 0x0d;      //Enable SCK\MOSI\NSS as push-pull output
     P3MDIN    = 0xFB;
     P0SKIP    = 0xCF;
@@ -63,6 +65,7 @@ void Init_Device(void)
 	IE &= ~0x80;
 
 	Port_IO_Init();
+
     Oscillator_Init();
     Timer_Init();
     UART_Init();

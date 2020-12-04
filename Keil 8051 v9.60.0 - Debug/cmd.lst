@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 1   
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE CMD
@@ -17,574 +17,587 @@ line level    source
    4           *  Created on: 2020年1月27日
    5           *      Author: wrangler
    6           */
-   7          #include "./src/uart.h"
-   8          #include "cmd.h"
-   9          
-  10          //cmd format
-  11          //0-1 eb 90
-  12          //2-5 ftw_lower_1
-  13          //6-9 ftw_upper_1
-  14          //10-13 ftw_lower_2
-  15          //14-17 ftw_upper_2
-  16          //18-21 step
-  17          //22-23 rate
-  18          //24-25 pulse_period,us
-  19          //26-28 re-sweep period,us
-  20          //29 tx衰减
-  21          //30 bit0~bit2系统模式 001-tv,010-th/tv切换,011-th/tv固定,100-一发三收,bit3-射频开关
-  22          //31-33 rx三个接收通道衰减
-  23          //34-36 rx三个接收通道移相控制
-  24          //37~40 校准时长,ms
-  25          //41~44 触发延迟,us
-  26          //45 crc
-  27          
-  28          idata unsigned char cmd_msg[CMD_MSG_LEN] = {0xeb,0x90};
-  29          unsigned char cmd_msg_valid = 0;
-  30          
-  31          unsigned char packet_buff[ASCII_FRAME_LEN];
-  32          unsigned char packet_buff_size = 0;
-  33          
-  34          double step_scale = 4294967296.0 / 3400.0;//2^32/fs
-  35          double clock_scale = 24.0 / 3400.0;  //us
-  36          
-  37          unsigned long freq_modulate = 20;//MHz/us
-  38          unsigned long freq_sweep_bw = 250;//us
-  39          unsigned long freq_mid = 17500;//MHz
-  40          
-  41          extern unsigned char spi_cmd_send_complete;
+   7          
+   8          #include <SI_C8051F310_Register_Enums.h>
+   9          #include "./src/uart.h"
+  10          #include "cmd.h"
+  11          
+  12          //cmd format
+  13          //0-1 eb 90
+  14          //2-5 ftw_lower_1
+  15          //6-9 ftw_upper_1
+  16          //10-13 ftw_lower_2
+  17          //14-17 ftw_upper_2
+  18          //18-21 step
+  19          //22-23 rate
+  20          //24-25 pulse_period,us
+  21          //26-28 re-sweep period,us
+  22          //29 tx衰减
+  23          //30 bit0~bit2系统模式 001-tv,010-th/tv切换,011-th/tv固定,100-一发三收,bit3-射频开关
+  24          //31-33 rx三个接收通道衰减
+  25          //34-36 rx三个接收通道移相控制
+  26          //37~40 校准时长,ms
+  27          //41~44 触发延迟,us
+  28          //45 crc
+  29          
+  30          idata unsigned char cmd_msg[CMD_MSG_LEN] = {0xeb,0x90};
+  31          unsigned char cmd_msg_valid = 0;
+  32          
+  33          unsigned char packet_buff[ASCII_FRAME_LEN];
+  34          unsigned char packet_buff_size = 0;
+  35          
+  36          double step_scale = 4294967296.0 / 3400.0;//2^32/fs
+  37          double clock_scale = 24.0 / 3400.0;  //us
+  38          
+  39          unsigned long freq_modulate = 20;//MHz/us
+  40          unsigned long freq_sweep_bw = 250;//us
+  41          double freq_mid = 1000.0;//MHz
   42          
-  43          //求最大公约数
-  44          unsigned long gcd(unsigned long x, unsigned long y)
-  45          {
-  46   1              unsigned long gcdNum = 1;
-  47   1              while (x != y)
-  48   1              {
-  49   2                      if (x % 2 == 0 && y % 2 == 0)
-  50   2                      {
-  51   3                              x /= 2;
-  52   3                              y /= 2;
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 2   
+  43          extern unsigned char spi_cmd_send_complete;
+  44          
+  45          //求最大公约数
+  46          unsigned long gcd(unsigned long x, unsigned long y)
+  47          {
+  48   1              unsigned long gcdNum = 1;
+  49   1              while (x != y)
+  50   1              {
+  51   2                      if (x % 2 == 0 && y % 2 == 0)
+  52   2                      {
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 2   
 
-  53   3                              gcdNum *= 2;
-  54   3                      }
-  55   2                      else
-  56   2                      {
-  57   3                              if (x > y)
-  58   3                                      x -= y;
-  59   3                              else
-  60   3                                      y -= x;
-  61   3                      }
-  62   2              }
-  63   1              return gcdNum * x;
-  64   1      }
-  65          
-  66          //字符串转数值
-  67          unsigned long String2Long(unsigned char* buf,unsigned char dec)
-  68          {
-  69   1              unsigned char i;
-  70   1              unsigned long res=0,var,temp = 1;
-  71   1              for(i=0;i<dec;i++)
-  72   1              {
-  73   2                      var = buf[dec - i - 1] - 0x30;
-  74   2                      var *= temp;
-  75   2                      res += var;
-  76   2      
-  77   2                      temp *= 10;
-  78   2              }
-  79   1      
-  80   1              return res;
-  81   1      }
-  82          
-  83          //32位转换位数组
-  84          void Format2Cmd(unsigned char* cmd,unsigned long var,unsigned char byte_width)
-  85          {
-  86   1        if(byte_width == 4)
-  87   1        {
-  88   2            cmd[0] = ((var & 0xff000000) >> 24);
-  89   2            cmd[1] = ((var & 0xff0000) >> 16);
-  90   2            cmd[2] = ((var & 0xff00) >> 8);
-  91   2            cmd[3] = var;
-  92   2        }
-  93   1        else if(byte_width == 3)
-  94   1        {
-  95   2            cmd[0] = ((var & 0xff0000) >> 16);
-  96   2            cmd[1] = ((var & 0xff00) >> 8);
-  97   2            cmd[2] = var;
-  98   2        }
-  99   1        else
- 100   1        {
- 101   2            cmd[0] = ((var & 0xff00) >> 8);
- 102   2            cmd[1] = var;
- 103   2        }
- 104   1      }
- 105          
- 106          //FTW计算
- 107          void FTWGen(unsigned long freq,unsigned char* cmd_msg)
- 108          {
- 109   1              unsigned long ftw=0,div;
- 110   1              double temp,m,n;
- 111   1      
- 112   1              //整数频率
- 113   1              ftw = freq_sweep_bw >> 1;
- 114   1              ftw = freq - ftw;
- 115   1              div = gcd(ftw,3400);
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 3   
+  53   3                              x /= 2;
+  54   3                              y /= 2;
+  55   3                              gcdNum *= 2;
+  56   3                      }
+  57   2                      else
+  58   2                      {
+  59   3                              if (x > y)
+  60   3                                      x -= y;
+  61   3                              else
+  62   3                                      y -= x;
+  63   3                      }
+  64   2              }
+  65   1              return gcdNum * x;
+  66   1      }
+  67          
+  68          //字符串转数值
+  69          unsigned long String2Long(unsigned char* buf,unsigned char dec)
+  70          {
+  71   1              unsigned char i;
+  72   1              unsigned long res=0,var,temp = 1;
+  73   1              for(i=0;i<dec;i++)
+  74   1              {
+  75   2                      var = buf[dec - i - 1] - 0x30;
+  76   2                      var *= temp;
+  77   2                      res += var;
+  78   2      
+  79   2                      temp *= 10;
+  80   2              }
+  81   1      
+  82   1              return res;
+  83   1      }
+  84          
+  85          //32位转换位数组
+  86          void Format2Cmd(unsigned char* cmd,unsigned long var,unsigned char byte_width)
+  87          {
+  88   1        if(byte_width == 4)
+  89   1        {
+  90   2            cmd[0] = ((var & 0xff000000) >> 24);
+  91   2            cmd[1] = ((var & 0xff0000) >> 16);
+  92   2            cmd[2] = ((var & 0xff00) >> 8);
+  93   2            cmd[3] = var;
+  94   2        }
+  95   1        else if(byte_width == 3)
+  96   1        {
+  97   2            cmd[0] = ((var & 0xff0000) >> 16);
+  98   2            cmd[1] = ((var & 0xff00) >> 8);
+  99   2            cmd[2] = var;
+ 100   2        }
+ 101   1        else
+ 102   1        {
+ 103   2            cmd[0] = ((var & 0xff00) >> 8);
+ 104   2            cmd[1] = var;
+ 105   2        }
+ 106   1      }
+ 107          
+ 108          //FTW计算
+ 109          void FTWGen(double freq,unsigned char* cmd_msg)
+ 110          {
+ 111   1              unsigned long ftw=0,div;
+ 112   1              double temp,m,n;
+ 113   1      
+ 114   1              //整数频率
+ 115   1              temp = freq_sweep_bw;
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 3   
 
- 116   1              m = ftw / div;
- 117   1              n = 3400 / div;
- 118   1              temp = 65536.0 / n;
- 119   1              temp *= 65536.0;
- 120   1              temp *= m;
- 121   1              ftw = temp;
- 122   1              cmd_msg[0] = ((ftw & 0xff000000) >> 24);
- 123   1              cmd_msg[1] = ((ftw & 0xff0000) >> 16);
- 124   1              cmd_msg[2] = ((ftw & 0xff00) >> 8);
- 125   1              cmd_msg[3] = ftw;
- 126   1      
- 127   1              ftw = freq_sweep_bw >> 1;
- 128   1              ftw = freq + ftw;
- 129   1              div = gcd(ftw,3400);
- 130   1              m = ftw / div;
- 131   1              n = 3400 / div;
- 132   1              temp = 65536.0 / n;
- 133   1              temp *= 65536.0;
- 134   1              temp *= m;
- 135   1              ftw = temp;
- 136   1              cmd_msg[4] = ((ftw & 0xff000000) >> 24);
- 137   1              cmd_msg[5] = ((ftw & 0xff0000) >> 16);
- 138   1              cmd_msg[6] = ((ftw & 0xff00) >> 8);
- 139   1              cmd_msg[7] = ftw;
- 140   1      }
- 141          
- 142          void BuffDel(unsigned char len)
- 143          {
- 144   1              unsigned char i;
- 145   1              packet_buff_size -= len;
- 146   1              for(i=0;i<packet_buff_size;i++)
- 147   1                packet_buff[i] = packet_buff[i+len];
- 148   1      }
- 149          
- 150          //计算累加和校验
- 151          void CmdCrcCalc()
- 152          {
- 153   1              unsigned char i;
- 154   1              cmd_msg[CMD_MSG_LEN-1] = 0;
- 155   1              for(i=0;i<CMD_MSG_LEN-1;i++)
- 156   1                      cmd_msg[CMD_MSG_LEN-1] += cmd_msg[i];
- 157   1      }
- 158          
- 159          unsigned char FrameHeaderSearch()
- 160          {
- 161   1        unsigned char i=0;
- 162   1        while(i+3<packet_buff_size)
- 163   1        {
- 164   2            if((packet_buff[i] != '#')
- 165   2                || (packet_buff[i+1] != 'K')
- 166   2                || (packet_buff[i+2] != 'R')
- 167   2                || (packet_buff[i+3] != ':'))
- 168   2            {
- 169   3              i++;
- 170   3              continue;
- 171   3            }
- 172   2      
- 173   2            break;
- 174   2        }
- 175   1      
- 176   1        return i;
- 177   1      }
- 178          
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 4   
+ 116   1              temp = temp / 2.0;
+ 117   1              temp = freq - temp;
+ 118   1              temp *= 10;
+ 119   1              div = gcd(temp,34000);
+ 120   1              m = temp / div;
+ 121   1              n = 34000 / div;
+ 122   1              temp = 65536.0 / n;
+ 123   1              temp *= 65536.0;
+ 124   1              temp *= m;
+ 125   1              ftw = temp;
+ 126   1              cmd_msg[0] = ((ftw & 0xff000000) >> 24);
+ 127   1              cmd_msg[1] = ((ftw & 0xff0000) >> 16);
+ 128   1              cmd_msg[2] = ((ftw & 0xff00) >> 8);
+ 129   1              cmd_msg[3] = ftw;
+ 130   1      
+ 131   1              temp = freq_sweep_bw;
+ 132   1              temp = temp / 2.0;
+ 133   1              temp = freq + temp;
+ 134   1              temp *= 10;
+ 135   1              div = gcd(temp,34000);
+ 136   1              m = temp / div;
+ 137   1              n = 34000 / div;
+ 138   1              temp = 65536.0 / n;
+ 139   1              temp *= 65536.0;
+ 140   1              temp *= m;
+ 141   1              ftw = temp;
+ 142   1              cmd_msg[4] = ((ftw & 0xff000000) >> 24);
+ 143   1              cmd_msg[5] = ((ftw & 0xff0000) >> 16);
+ 144   1              cmd_msg[6] = ((ftw & 0xff00) >> 8);
+ 145   1              cmd_msg[7] = ftw;
+ 146   1      }
+ 147          
+ 148          void BuffDel(unsigned char len)
+ 149          {
+ 150   1              unsigned char i;
+ 151   1              packet_buff_size -= len;
+ 152   1              for(i=0;i<packet_buff_size;i++)
+ 153   1                packet_buff[i] = packet_buff[i+len];
+ 154   1      }
+ 155          
+ 156          //计算累加和校验
+ 157          void CmdCrcCalc()
+ 158          {
+ 159   1              unsigned char i;
+ 160   1              cmd_msg[CMD_MSG_LEN-1] = 0;
+ 161   1              for(i=0;i<CMD_MSG_LEN-1;i++)
+ 162   1                      cmd_msg[CMD_MSG_LEN-1] += cmd_msg[i];
+ 163   1      }
+ 164          
+ 165          unsigned char FrameHeaderSearch()
+ 166          {
+ 167   1        unsigned char i=0;
+ 168   1        while(i+3<packet_buff_size)
+ 169   1        {
+ 170   2            if((packet_buff[i] != '#')
+ 171   2                || (packet_buff[i+1] != 'K')
+ 172   2                || (packet_buff[i+2] != 'R')
+ 173   2                || (packet_buff[i+3] != ':'))
+ 174   2            {
+ 175   3              i++;
+ 176   3              continue;
+ 177   3            }
+ 178   2      
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 4   
 
- 179          //ASCII命令转二进制命令
- 180          unsigned char Frame2CmdConvert()
- 181          {
- 182   1              unsigned char len;
- 183   1      
- 184   1      //      len = UART_GetBuff(packet_buff + packet_buff_size,ASCII_FRAME_LEN-packet_buff_size);
- 185   1      //      packet_buff_size += len;
- 186   1      
- 187   1              if(packet_buff_size < ASCII_FRAME_LEN)
- 188   1                      return 0;
+ 179   2            break;
+ 180   2        }
+ 181   1      
+ 182   1        return i;
+ 183   1      }
+ 184          
+ 185          //ASCII命令转二进制命令
+ 186          unsigned char Frame2CmdConvert()
+ 187          {
+ 188   1              unsigned char len;
  189   1      
- 190   1              if(spi_cmd_send_complete != 1)
- 191   1                return 0;
+ 190   1      //      len = UART_GetBuff(packet_buff + packet_buff_size,ASCII_FRAME_LEN-packet_buff_size);
+ 191   1      //      packet_buff_size += len;
  192   1      
- 193   1              len = FrameHeaderSearch();
- 194   1              if(len != 0)
- 195   1              {
- 196   2                BuffDel(packet_buff_size - len);
- 197   2                return 0;
- 198   2              }
- 199   1      
- 200   1              if(KRParser(packet_buff) == 0)
+ 193   1              if(packet_buff_size < ASCII_FRAME_LEN)
+ 194   1                      return 0;
+ 195   1      
+ 196   1              if(spi_cmd_send_complete != 1)
+ 197   1                return 0;
+ 198   1      
+ 199   1              len = FrameHeaderSearch();
+ 200   1              if(len != 0)
  201   1              {
- 202   2                      packet_buff_size = 0;
- 203   2                      return 0;
+ 202   2                BuffDel(len);
+ 203   2                return 0;
  204   2              }
  205   1      
- 206   1              if(FreqParser(packet_buff+11) == 0)
+ 206   1              if(KRParser(packet_buff) == 0)
  207   1              {
  208   2                      packet_buff_size = 0;
  209   2                      return 0;
  210   2              }
  211   1      
- 212   1              if(PWParser(packet_buff+22) == 0)
+ 212   1              if(FreqParser(packet_buff+11) == 0)
  213   1              {
  214   2                      packet_buff_size = 0;
  215   2                      return 0;
  216   2              }
  217   1      
- 218   1              if(PRTParser(packet_buff+34) == 0)
+ 218   1              if(PWParser(packet_buff+22) == 0)
  219   1              {
  220   2                      packet_buff_size = 0;
  221   2                      return 0;
  222   2              }
  223   1      
- 224   1              if(ATTParser(packet_buff+47) == 0)
+ 224   1              if(PRTParser(packet_buff+34) == 0)
  225   1              {
  226   2                      packet_buff_size = 0;
  227   2                      return 0;
  228   2              }
  229   1      
- 230   1              if(RFParser(packet_buff+62) == 0)
+ 230   1              if(ATTParser(packet_buff+47) == 0)
  231   1              {
  232   2                      packet_buff_size = 0;
  233   2                      return 0;
  234   2              }
  235   1      
- 236   1              if(MODParser(packet_buff+68) == 0)
+ 236   1              if(RFParser(packet_buff+62) == 0)
  237   1              {
  238   2                      packet_buff_size = 0;
  239   2                      return 0;
  240   2              }
  241   1      
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 5   
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 5   
 
- 242   1              if(CTParser(packet_buff+75) == 0)
+ 242   1              if(MODParser(packet_buff+68) == 0)
  243   1              {
  244   2                      packet_buff_size = 0;
  245   2                      return 0;
  246   2              }
  247   1      
- 248   1              if(AAParser(packet_buff+86,31) == 0)
+ 248   1              if(CTParser(packet_buff+75) == 0)
  249   1              {
  250   2                      packet_buff_size = 0;
  251   2                      return 0;
  252   2              }
  253   1      
- 254   1              if(PSParser(packet_buff+94,34) == 0)
+ 254   1              if(AAParser(packet_buff+86,31) == 0)
  255   1              {
  256   2                      packet_buff_size = 0;
  257   2                      return 0;
  258   2              }
  259   1      
- 260   1              if(AAParser(packet_buff+102,32) == 0)
+ 260   1              if(PSParser(packet_buff+94,34) == 0)
  261   1              {
  262   2                      packet_buff_size = 0;
  263   2                      return 0;
  264   2              }
  265   1      
- 266   1              if(PSParser(packet_buff+110,35) == 0)
+ 266   1              if(AAParser(packet_buff+102,32) == 0)
  267   1              {
  268   2                      packet_buff_size = 0;
  269   2                      return 0;
  270   2              }
  271   1      
- 272   1              if(AAParser(packet_buff+118,33) == 0)
+ 272   1              if(PSParser(packet_buff+110,35) == 0)
  273   1              {
  274   2                      packet_buff_size = 0;
  275   2                      return 0;
  276   2              }
  277   1      
- 278   1              if(PSParser(packet_buff+126,36) == 0)
+ 278   1              if(AAParser(packet_buff+118,33) == 0)
  279   1              {
  280   2                      packet_buff_size = 0;
  281   2                      return 0;
  282   2              }
  283   1      
- 284   1              if(YSParser(packet_buff+140) == 0)
+ 284   1              if(PSParser(packet_buff+126,36) == 0)
  285   1              {
  286   2                      packet_buff_size = 0;
  287   2                      return 0;
  288   2              }
  289   1      
- 290   1              packet_buff_size = 0;
- 291   1      
- 292   1        FTWGen(freq_mid,cmd_msg+2);
- 293   1        FTWGen(freq_mid+2.5,cmd_msg+10);
- 294   1        CmdCrcCalc();
+ 290   1              if(YSParser(packet_buff+140) == 0)
+ 291   1              {
+ 292   2                      packet_buff_size = 0;
+ 293   2                      return 0;
+ 294   2              }
  295   1      
- 296   1        cmd_msg_valid = 1;
- 297   1              return 1;
- 298   1      }
- 299          
- 300          unsigned char KRParser(unsigned char* buf)
- 301          {
- 302   1        unsigned long var;
- 303   1      
- 304   1        if((buf[0] != '#')
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 6   
+ 296   1              packet_buff_size = 0;
+ 297   1      
+ 298   1        FTWGen(freq_mid,cmd_msg+2);
+ 299   1        FTWGen(freq_mid+2.5,cmd_msg+10);
+ 300   1        CmdCrcCalc();
+ 301   1      
+ 302   1        cmd_msg_valid = 1;
+ 303   1              return 1;
+ 304   1      }
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 6   
 
- 305   1              || (buf[1] != 'K')
- 306   1              || (buf[2] != 'R')
- 307   1              || (buf[3] != ':')
- 308   1              || (buf[10] != ';'))
- 309   1          return 0;
- 310   1      
- 311   1        var = String2Long(buf+4,6);
- 312   1        var /= 32768;
- 313   1        freq_modulate = var;
- 314   1      
- 315   1        return 1;
- 316   1      }
- 317          
- 318          unsigned char FreqParser(unsigned char* buf)
- 319          {
- 320   1        unsigned long var;
- 321   1      
- 322   1        if((buf[0] != '#')
- 323   1                || (buf[1] != 'F')
- 324   1                || (buf[2] != 'R')
- 325   1                || (buf[3] != 'Q')
- 326   1                || (buf[4] != ':')
- 327   1                || (buf[10] != ';'))
- 328   1          return 0;
- 329   1      
- 330   1        var = String2Long(buf+5,5);
- 331   1        var -= 13500;
- 332   1        var /= 4;
- 333   1      
- 334   1        freq_mid = var;
- 335   1        return 1;
- 336   1      }
- 337          
- 338          unsigned char PWParser(unsigned char* buf)
- 339          {
- 340   1              unsigned long var;
- 341   1              double fvar;
- 342   1      
- 343   1              if((buf[0] != '#')
- 344   1                      || (buf[1] != 'P')
- 345   1                      || (buf[2] != 'W')
- 346   1                      || (buf[3] != ':')
- 347   1                      || (buf[11] != ';'))
- 348   1                      return 0;
- 349   1      
- 350   1              var = String2Long(buf+4,7);
- 351   1              Format2Cmd(cmd_msg+24,var,2);
- 352   1      
- 353   1              freq_sweep_bw = freq_modulate * var;
- 354   1              freq_sweep_bw /= 4;
+ 305          
+ 306          unsigned char KRParser(unsigned char* buf)
+ 307          {
+ 308   1        unsigned long var;
+ 309   1      
+ 310   1        if((buf[0] != '#')
+ 311   1              || (buf[1] != 'K')
+ 312   1              || (buf[2] != 'R')
+ 313   1              || (buf[3] != ':')
+ 314   1              || (buf[10] != ';'))
+ 315   1          return 0;
+ 316   1      
+ 317   1        var = String2Long(buf+4,6);
+ 318   1        var /= 32768;
+ 319   1        freq_modulate = var;
+ 320   1      
+ 321   1        return 1;
+ 322   1      }
+ 323          
+ 324          unsigned char FreqParser(unsigned char* buf)
+ 325          {
+ 326   1        unsigned long var;
+ 327   1      
+ 328   1        if((buf[0] != '#')
+ 329   1                || (buf[1] != 'F')
+ 330   1                || (buf[2] != 'R')
+ 331   1                || (buf[3] != 'Q')
+ 332   1                || (buf[4] != ':')
+ 333   1                || (buf[10] != ';'))
+ 334   1          return 0;
+ 335   1      
+ 336   1        var = String2Long(buf+5,5);
+ 337   1        var -= 13500;
+ 338   1        var /= 4;
+ 339   1      
+ 340   1        freq_mid = var;
+ 341   1        return 1;
+ 342   1      }
+ 343          
+ 344          unsigned char PWParser(unsigned char* buf)
+ 345          {
+ 346   1              unsigned long var;
+ 347   1              double fvar;
+ 348   1      
+ 349   1              if((buf[0] != '#')
+ 350   1                      || (buf[1] != 'P')
+ 351   1                      || (buf[2] != 'W')
+ 352   1                      || (buf[3] != ':')
+ 353   1                      || (buf[11] != ';'))
+ 354   1                      return 0;
  355   1      
- 356   1              fvar = var / clock_scale;
- 357   1              fvar = freq_sweep_bw / fvar;
- 358   1              var = fvar * step_scale;
- 359   1              Format2Cmd(cmd_msg+18,var,4);
- 360   1      
- 361   1              cmd_msg[22] = 0x00;
- 362   1              cmd_msg[23] = 0x01;
- 363   1      
- 364   1              return 1;
- 365   1      }
- 366          
- 367          unsigned char PRTParser(unsigned char * buf)
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 7   
+ 356   1              var = String2Long(buf+4,7);
+ 357   1              Format2Cmd(cmd_msg+24,var,2);
+ 358   1      
+ 359   1              freq_sweep_bw = freq_modulate * var;
+ 360   1              freq_sweep_bw /= 4;
+ 361   1      
+ 362   1              fvar = var / clock_scale;
+ 363   1              fvar = freq_sweep_bw / fvar;
+ 364   1              var = fvar * step_scale;
+ 365   1              Format2Cmd(cmd_msg+18,var,4);
+ 366   1      
+ 367   1              cmd_msg[22] = 0x00;
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 7   
 
- 368          {
- 369   1              unsigned long var;
- 370   1      
- 371   1              if((buf[0] != '#')
- 372   1                              || (buf[1] != 'P')
- 373   1                              || (buf[2] != 'R')
- 374   1                              || (buf[3] != 'T')
- 375   1                              || (buf[4] != ':')
- 376   1                              || (buf[12] != ';'))
- 377   1                      return 0;
- 378   1      
- 379   1        var = String2Long(buf+5,7);
- 380   1        //var /= clock_scale;
- 381   1        Format2Cmd(cmd_msg+26,var,3);
- 382   1      
- 383   1        return 1;
- 384   1      }
- 385          
- 386          unsigned char ATTParser(unsigned char* buf)
- 387          {
- 388   1              unsigned long var;
- 389   1      
- 390   1              if((buf[0] != '#')
- 391   1                    || (buf[1] != 'A')
- 392   1                    || (buf[2] != 'T')
- 393   1                    || (buf[3] != 'T')
- 394   1                    || (buf[4] != ':')
- 395   1                    || (buf[7] != ';'))
- 396   1                      return 0;
- 397   1      
- 398   1      
- 399   1        var = String2Long(buf+5,2);
- 400   1        if(var > 18)
- 401   1          var = 18;
- 402   1        if(var != 0)
- 403   1          var += 13;
+ 368   1              cmd_msg[23] = 0x01;
+ 369   1      
+ 370   1              return 1;
+ 371   1      }
+ 372          
+ 373          unsigned char PRTParser(unsigned char * buf)
+ 374          {
+ 375   1              unsigned long var;
+ 376   1      
+ 377   1              if((buf[0] != '#')
+ 378   1                              || (buf[1] != 'P')
+ 379   1                              || (buf[2] != 'R')
+ 380   1                              || (buf[3] != 'T')
+ 381   1                              || (buf[4] != ':')
+ 382   1                              || (buf[12] != ';'))
+ 383   1                      return 0;
+ 384   1      
+ 385   1        var = String2Long(buf+5,7);
+ 386   1        //var /= clock_scale;
+ 387   1        Format2Cmd(cmd_msg+26,var,3);
+ 388   1      
+ 389   1        return 1;
+ 390   1      }
+ 391          
+ 392          unsigned char ATTParser(unsigned char* buf)
+ 393          {
+ 394   1              unsigned long var;
+ 395   1      
+ 396   1              if((buf[0] != '#')
+ 397   1                    || (buf[1] != 'A')
+ 398   1                    || (buf[2] != 'T')
+ 399   1                    || (buf[3] != 'T')
+ 400   1                    || (buf[4] != ':')
+ 401   1                    || (buf[7] != ';'))
+ 402   1                      return 0;
+ 403   1      
  404   1      
- 405   1        var = (var << 1);
- 406   1      
- 407   1        cmd_msg[29] = var;
- 408   1        cmd_msg[29] = ~cmd_msg[29];
- 409   1        return 1;
- 410   1      }
- 411          
- 412          unsigned char RFParser(unsigned char* buf)
- 413          {
- 414   1              if((buf[0] != '#')
- 415   1                              || (buf[1] != 'R')
- 416   1                              || (buf[2] != 'F')
- 417   1                              || (buf[3] != ':')
- 418   1                              || (buf[5] != ';'))
- 419   1                      return 0;
- 420   1      
- 421   1              if(buf[4] == '1')
- 422   1                      cmd_msg[30] |= 0x08;
- 423   1              else cmd_msg[30] &= ~0x08;
- 424   1      
- 425   1              return 1;
- 426   1      }
- 427          
- 428          unsigned char MODParser(unsigned char* buf)
- 429          {
- 430   1              if((buf[0] != '#')
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 8   
+ 405   1        var = String2Long(buf+5,2);
+ 406   1        if(var > 17)
+ 407   1          var = 17;
+ 408   1      
+ 409   1        if(var == 0)
+ 410   1          var += 3;
+ 411   1        else var += 14;
+ 412   1      
+ 413   1        var = (var << 1);
+ 414   1      
+ 415   1        cmd_msg[29] = var;
+ 416   1        cmd_msg[29] = ~cmd_msg[29];
+ 417   1        return 1;
+ 418   1      }
+ 419          
+ 420          unsigned char RFParser(unsigned char* buf)
+ 421          {
+ 422   1              if((buf[0] != '#')
+ 423   1                              || (buf[1] != 'R')
+ 424   1                              || (buf[2] != 'F')
+ 425   1                              || (buf[3] != ':')
+ 426   1                              || (buf[5] != ';'))
+ 427   1                      return 0;
+ 428   1      
+ 429   1              if(buf[4] == '1')
+ 430   1              {
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 8   
 
- 431   1                    || (buf[1] != 'M')
- 432   1                    || (buf[2] != 'O')
- 433   1                    || (buf[3] != 'D')
- 434   1                    || (buf[4] != ':')
- 435   1                    || (buf[6] != ';'))
- 436   1                        return 0;
- 437   1      
- 438   1        cmd_msg[30] &= ~0x07;
- 439   1        if(buf[5] == '1')
- 440   1        {
- 441   2          cmd_msg[30] |= 0x01;//一发一收tv
- 442   2        }
- 443   1        else if(buf[5] == '2')
- 444   1        {
- 445   2          cmd_msg[30] |= 0x02;//一发两收tr/tv
- 446   2        }
- 447   1        else if(buf[5] == '3')
- 448   1        {
- 449   2          cmd_msg[30] |= 0x03;//一发两收tr+tv
- 450   2        }
- 451   1        else if(buf[5] == '4')
- 452   1        {
- 453   2          cmd_msg[30] |= 0x04;//一发三收
- 454   2        }
- 455   1      
- 456   1        return 1;
- 457   1      }
- 458          
- 459          unsigned char CTParser(unsigned char* buf)
- 460          {
- 461   1              unsigned long var;
- 462   1              //double fvar;
- 463   1      
- 464   1              if((buf[0] != '#')
- 465   1                              || (buf[1] != 'C')
- 466   1                              || (buf[2] != 'T')
- 467   1                              || (buf[3] != ':')
- 468   1                              || (buf[10] != ';'))
- 469   1                      return 0;
+ 431   2                  cmd_msg[30] |= 0x08;
+ 432   2                  P1 |= 0x08;
+ 433   2              }
+ 434   1              else
+ 435   1              {
+ 436   2                  cmd_msg[30] &= ~0x08;
+ 437   2                  P1 &= ~0x08;
+ 438   2              }
+ 439   1      
+ 440   1              return 1;
+ 441   1      }
+ 442          
+ 443          unsigned char MODParser(unsigned char* buf)
+ 444          {
+ 445   1              if((buf[0] != '#')
+ 446   1                    || (buf[1] != 'M')
+ 447   1                    || (buf[2] != 'O')
+ 448   1                    || (buf[3] != 'D')
+ 449   1                    || (buf[4] != ':')
+ 450   1                    || (buf[6] != ';'))
+ 451   1                        return 0;
+ 452   1      
+ 453   1        cmd_msg[30] &= ~0x07;
+ 454   1        if(buf[5] == '1')
+ 455   1        {
+ 456   2          cmd_msg[30] |= 0x01;//一发一收tv
+ 457   2        }
+ 458   1        else if(buf[5] == '2')
+ 459   1        {
+ 460   2          cmd_msg[30] |= 0x02;//一发两收tr/tv
+ 461   2        }
+ 462   1        else if(buf[5] == '3')
+ 463   1        {
+ 464   2          cmd_msg[30] |= 0x03;//一发两收tr+tv
+ 465   2        }
+ 466   1        else if(buf[5] == '4')
+ 467   1        {
+ 468   2          cmd_msg[30] |= 0x04;//一发三收
+ 469   2        }
  470   1      
- 471   1              var = String2Long(buf+4,6);
- 472   1              var *= 100;
- 473   1              Format2Cmd(cmd_msg+37,var,4);
- 474   1      
- 475   1              return 1;
- 476   1      }
- 477          
- 478          unsigned char AAParser(unsigned char* buf,unsigned char index)
- 479          {
- 480   1              unsigned long var;
- 481   1      
- 482   1              if((buf[0] != '#')
- 483   1                              || (buf[1] != 'A')
- 484   1                              || (buf[2] != 'A')
- 485   1                              /*|| (buf[3] != 'A')*/
- 486   1                              || (buf[4] != ':')
- 487   1                              || (buf[7] != ';'))
- 488   1                      return 0;
+ 471   1        return 1;
+ 472   1      }
+ 473          
+ 474          unsigned char CTParser(unsigned char* buf)
+ 475          {
+ 476   1              unsigned long var;
+ 477   1              //double fvar;
+ 478   1      
+ 479   1              if((buf[0] != '#')
+ 480   1                              || (buf[1] != 'C')
+ 481   1                              || (buf[2] != 'T')
+ 482   1                              || (buf[3] != ':')
+ 483   1                              || (buf[10] != ';'))
+ 484   1                      return 0;
+ 485   1      
+ 486   1              var = String2Long(buf+4,6);
+ 487   1              var *= 100;
+ 488   1              Format2Cmd(cmd_msg+37,var,4);
  489   1      
- 490   1              var = String2Long(buf+5,2);
- 491   1      //      var = ~var;
- 492   1      //      cmd_msg[index] = 0;
- 493   1      //      cmd_msg[index] |= (var & 0x01)<<5;
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 9   
+ 490   1              return 1;
+ 491   1      }
+ 492          
+ 493          unsigned char AAParser(unsigned char* buf,unsigned char index)
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 9   
 
- 494   1      //      cmd_msg[index] |= (var & 0x02)<<3;
- 495   1      //      cmd_msg[index] |= (var & 0x04)<<1;
- 496   1      //      cmd_msg[index] |= (var & 0x08)>>1;
- 497   1      //      cmd_msg[index] |= (var & 0x10)>>3;
- 498   1      //      cmd_msg[index] |= (var & 0x20)>>5;
- 499   1              cmd_msg[index] = var;
- 500   1      
- 501   1              return 1;
- 502   1      }
- 503          
- 504          unsigned char PSParser(unsigned char* buf,unsigned char index)
- 505          {
- 506   1              unsigned long var;
- 507   1      
- 508   1              if((buf[0] != '#')
- 509   1                              || (buf[1] != 'P')
- 510   1                              || (buf[2] != 'S')
- 511   1                              /*|| (buf[3] != 'A')*/
- 512   1                              || (buf[4] != ':')
- 513   1                              || (buf[7] != ';'))
- 514   1                      return 0;
- 515   1      
- 516   1              var = String2Long(buf+5,2);
- 517   1              cmd_msg[index] = var;
- 518   1      
- 519   1              return 1;
- 520   1      }
- 521          
- 522          unsigned char YSParser(unsigned char* buf)
- 523          {
- 524   1              unsigned long var;
- 525   1              //double fvar;
- 526   1      
- 527   1              if((buf[0] != '#')
- 528   1                      || (buf[1] != 'Y')
- 529   1                      || (buf[2] != 'S')
- 530   1                      || (buf[3] != ':')
- 531   1                      || (buf[6] != ';'))
- 532   1                      return 0;
- 533   1      
- 534   1        var = String2Long(buf+4,2);
- 535   1      //  fvar = var;
- 536   1      //  fvar /= clock_scale;
- 537   1      //  var = fvar;
- 538   1        Format2Cmd(cmd_msg+41,var,4);
+ 494          {
+ 495   1              unsigned long var;
+ 496   1      
+ 497   1              if((buf[0] != '#')
+ 498   1                              || (buf[1] != 'A')
+ 499   1                              || (buf[2] != 'A')
+ 500   1                              /*|| (buf[3] != 'A')*/
+ 501   1                              || (buf[4] != ':')
+ 502   1                              || (buf[7] != ';'))
+ 503   1                      return 0;
+ 504   1      
+ 505   1              var = String2Long(buf+5,2);
+ 506   1              if(var > 40)
+ 507   1                var = 40;
+ 508   1      
+ 509   1              var *= 25;
+ 510   1              var = 1000 - var;
+ 511   1              var /= 39;
+ 512   1              cmd_msg[index] = var;
+ 513   1      
+ 514   1              return 1;
+ 515   1      }
+ 516          
+ 517          unsigned char PSParser(unsigned char* buf,unsigned char index)
+ 518          {
+ 519   1              unsigned long var;
+ 520   1      
+ 521   1              if((buf[0] != '#')
+ 522   1                              || (buf[1] != 'P')
+ 523   1                              || (buf[2] != 'S')
+ 524   1                              /*|| (buf[3] != 'A')*/
+ 525   1                              || (buf[4] != ':')
+ 526   1                              || (buf[7] != ';'))
+ 527   1                      return 0;
+ 528   1      
+ 529   1              var = String2Long(buf+5,2);
+ 530   1              cmd_msg[index] = var;
+ 531   1      
+ 532   1              return 1;
+ 533   1      }
+ 534          
+ 535          unsigned char YSParser(unsigned char* buf)
+ 536          {
+ 537   1              unsigned long var;
+ 538   1              //double fvar;
  539   1      
- 540   1        return 1;
- 541   1      }
- 542          
- 543          
+ 540   1              if((buf[0] != '#')
+ 541   1                      || (buf[1] != 'Y')
+ 542   1                      || (buf[2] != 'S')
+ 543   1                      || (buf[3] != ':')
+ 544   1                      || (buf[6] != ';'))
+ 545   1                      return 0;
+ 546   1      
+ 547   1        var = String2Long(buf+4,2);
+ 548   1      //  fvar = var;
+ 549   1      //  fvar /= clock_scale;
+ 550   1      //  var = fvar;
+ 551   1        Format2Cmd(cmd_msg+41,var,4);
+ 552   1      
+ 553   1        return 1;
+ 554   1      }
+ 555          
+ 556          
+C51 COMPILER V9.60.0.0   CMD                                                               12/04/2020 18:47:02 PAGE 10  
+
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   3326    ----
+   CODE SIZE        =   3625    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
-   PDATA SIZE       =    169      90
+   PDATA SIZE       =    169      94
    DATA SIZE        =   ----    ----
    IDATA SIZE       =     46    ----
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----
    HDATA SIZE       =   ----    ----
    XDATA CONST SIZE =   ----    ----
-C51 COMPILER V9.60.0.0   CMD                                                               12/02/2020 17:39:16 PAGE 10  
-
    FAR CONST SIZE   =   ----    ----
 END OF MODULE INFORMATION.
 

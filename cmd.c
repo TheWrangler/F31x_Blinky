@@ -4,6 +4,8 @@
  *  Created on: 2020年1月27日
  *      Author: wrangler
  */
+
+#include <SI_C8051F310_Register_Enums.h>
 #include "./src/uart.h"
 #include "cmd.h"
 
@@ -36,7 +38,7 @@ double clock_scale = 24.0 / 3400.0;  //us
 
 unsigned long freq_modulate = 20;//MHz/us
 unsigned long freq_sweep_bw = 250;//us
-unsigned long freq_mid = 17500;//MHz
+double freq_mid = 1000.0;//MHz
 
 extern unsigned char spi_cmd_send_complete;
 
@@ -104,17 +106,19 @@ void Format2Cmd(unsigned char* cmd,unsigned long var,unsigned char byte_width)
 }
 
 //FTW计算
-void FTWGen(unsigned long freq,unsigned char* cmd_msg)
+void FTWGen(double freq,unsigned char* cmd_msg)
 {
 	unsigned long ftw=0,div;
 	double temp,m,n;
 
 	//整数频率
-	ftw = freq_sweep_bw >> 1;
-	ftw = freq - ftw;
-	div = gcd(ftw,3400);
-	m = ftw / div;
-	n = 3400 / div;
+	temp = freq_sweep_bw;
+	temp = temp / 2.0;
+	temp = freq - temp;
+	temp *= 10;
+	div = gcd(temp,34000);
+	m = temp / div;
+	n = 34000 / div;
 	temp = 65536.0 / n;
 	temp *= 65536.0;
 	temp *= m;
@@ -124,11 +128,13 @@ void FTWGen(unsigned long freq,unsigned char* cmd_msg)
 	cmd_msg[2] = ((ftw & 0xff00) >> 8);
 	cmd_msg[3] = ftw;
 
-	ftw = freq_sweep_bw >> 1;
-	ftw = freq + ftw;
-	div = gcd(ftw,3400);
-	m = ftw / div;
-	n = 3400 / div;
+	temp = freq_sweep_bw;
+	temp = temp / 2.0;
+	temp = freq + temp;
+	temp *= 10;
+	div = gcd(temp,34000);
+	m = temp / div;
+	n = 34000 / div;
 	temp = 65536.0 / n;
 	temp *= 65536.0;
 	temp *= m;
@@ -193,7 +199,7 @@ unsigned char Frame2CmdConvert()
 	len = FrameHeaderSearch();
 	if(len != 0)
 	{
-	  BuffDel(packet_buff_size - len);
+	  BuffDel(len);
 	  return 0;
 	}
 
@@ -397,10 +403,12 @@ unsigned char ATTParser(unsigned char* buf)
 
 
   var = String2Long(buf+5,2);
-  if(var > 18)
-    var = 18;
-  if(var != 0)
-    var += 13;
+  if(var > 17)
+    var = 17;
+
+  if(var == 0)
+    var += 3;
+  else var += 14;
 
   var = (var << 1);
 
@@ -419,8 +427,15 @@ unsigned char RFParser(unsigned char* buf)
 		return 0;
 
 	if(buf[4] == '1')
-		cmd_msg[30] |= 0x08;
-	else cmd_msg[30] &= ~0x08;
+	{
+	    cmd_msg[30] |= 0x08;
+	    P1 |= 0x08;
+	}
+	else
+	{
+	    cmd_msg[30] &= ~0x08;
+	    P1 &= ~0x08;
+	}
 
 	return 1;
 }
@@ -488,14 +503,12 @@ unsigned char AAParser(unsigned char* buf,unsigned char index)
 		return 0;
 
 	var = String2Long(buf+5,2);
-//	var = ~var;
-//	cmd_msg[index] = 0;
-//	cmd_msg[index] |= (var & 0x01)<<5;
-//	cmd_msg[index] |= (var & 0x02)<<3;
-//	cmd_msg[index] |= (var & 0x04)<<1;
-//	cmd_msg[index] |= (var & 0x08)>>1;
-//	cmd_msg[index] |= (var & 0x10)>>3;
-//	cmd_msg[index] |= (var & 0x20)>>5;
+	if(var > 40)
+	  var = 40;
+
+	var *= 25;
+	var = 1000 - var;
+	var /= 39;
 	cmd_msg[index] = var;
 
 	return 1;

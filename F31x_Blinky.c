@@ -27,19 +27,32 @@ void SiLabs_Startup (void)
    PCA0MD &= ~0x40;                       // WDTE = 0 (clear watchdog timer
 }
 
+void delay()
+{
+  unsigned long i=0,j=0;
+  for(;i<600000;i++)
+    for(;j<100000;j++)
+    {;}
+}
+
 //-----------------------------------------------------------------------------
 // MAIN Routine
 //-----------------------------------------------------------------------------
 void main (void)
 {
 	unsigned int adc_var;
-	unsigned char adc_target = 0;
+	//unsigned char adc_target = 0;
 
 	Init_Device();
 
+	delay();
+
+
+	P1 |= 0x02;
+
 	while(1)
 	{
-	  ADC_Start(adc_target);
+	  ADC_Start(/*adc_target*/);
 
 
 //		if(Frame2CmdConvert() == 1)
@@ -67,16 +80,16 @@ void main (void)
 
 		if(ADC_Get(&adc_var) == 1)
     {
-      if(adc_target == 0)
-      {
+//      if(adc_target == 0)
+//      {
         Teamperature_Convert(adc_var);
-        adc_target = 1;
-      }
-      else
-      {
-        Bite_Convert(adc_var);
-        adc_target = 0;
-      }
+//        adc_target = 1;
+//      }
+//      else
+//      {
+//        Bite_Convert(adc_var);
+//        adc_target = 0;
+//      }
     }
 	}
 }

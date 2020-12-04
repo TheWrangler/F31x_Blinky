@@ -4,6 +4,7 @@
  *  Created on: 2020年1月27日
  *      Author: wrangler
  */
+#include <SI_C8051F310_Register_Enums.h>
 #include "sta.h"
 #include "cmd.h"
 
@@ -72,16 +73,20 @@ void Teamperature_Convert(unsigned int adc_var)
 	temperature *= 3300;
 	temperature -= 897;
 	temperature /= 3.35;
+
+	if(temperature > 100.0)
+	  P1 &= ~0x04;
+	else P1 |= 0x04;
 }
 
-void Bite_Convert(unsigned int adc_var)
-{
-	bite = adc_var;
-	bite *= 3.3;
-	bite /= 4096.0;
-//	bite *= 33.7985;
-//	bite += 16.9617;
-}
+//void Bite_Convert(unsigned int adc_var)
+//{
+//	bite = adc_var;
+//	bite *= 3.3;
+//	bite /= 4096.0;
+////	bite *= 33.7985;
+////	bite += 16.9617;
+//}
 
 void UpdateFrame()
 {

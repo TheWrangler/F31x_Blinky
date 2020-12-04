@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       12/02/2020 17:39:16 PAGE 1   
+C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       12/04/2020 19:09:48 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE F31X_BLINKY
@@ -40,68 +40,81 @@ line level    source
   27   1         PCA0MD &= ~0x40;                       // WDTE = 0 (clear watchdog timer
   28   1      }
   29          
-  30          //-----------------------------------------------------------------------------
-  31          // MAIN Routine
-  32          //-----------------------------------------------------------------------------
-  33          void main (void)
-  34          {
-  35   1              unsigned int adc_var;
-  36   1              unsigned char adc_target = 0;
-  37   1      
-  38   1              Init_Device();
-  39   1      
-  40   1              while(1)
-  41   1              {
-  42   2                ADC_Start(adc_target);
-  43   2      
-  44   2      
-  45   2      //              if(Frame2CmdConvert() == 1)
-  46   2      //              {
-  47   2      //      if(sta_msg_send_complete == 1)
-  48   2      //        UpdateFrame();
-  49   2      //              }
-  50   2      
-  51   2                      UART_GetBuff();
-  52   2      
-C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       12/02/2020 17:39:16 PAGE 2   
+  30          void delay()
+  31          {
+  32   1        unsigned long i=0,j=0;
+  33   1        for(;i<600000;i++)
+  34   1          for(;j<100000;j++)
+  35   1          {;}
+  36   1      }
+  37          
+  38          //-----------------------------------------------------------------------------
+  39          // MAIN Routine
+  40          //-----------------------------------------------------------------------------
+  41          void main (void)
+  42          {
+  43   1              unsigned int adc_var;
+  44   1              //unsigned char adc_target = 0;
+  45   1      
+  46   1              Init_Device();
+  47   1      
+  48   1              delay();
+  49   1      
+  50   1      
+  51   1              P1 |= 0x02;
+  52   1      
+C51 COMPILER V9.60.0.0   F31X_BLINKY                                                       12/04/2020 19:09:48 PAGE 2   
 
-  53   2                      if(cmd_msg_valid == 1)
-  54   2                      {
-  55   3            SPI_Send();
-  56   3            cmd_msg_valid = 0;
-  57   3          }
-  58   2      
-  59   2                      if(sta_msg_send_complete == 1)
-  60   2          {
-  61   3                        if(Frame2CmdConvert() == 1)
-  62   3                          UpdateFrame();
-  63   3      
-  64   3            UpdateSta();
-  65   3            UART_Send();
-  66   3          }
-  67   2      
-  68   2                      if(ADC_Get(&adc_var) == 1)
-  69   2          {
-  70   3            if(adc_target == 0)
-  71   3            {
-  72   4              Teamperature_Convert(adc_var);
-  73   4              adc_target = 1;
-  74   4            }
-  75   3            else
-  76   3            {
-  77   4              Bite_Convert(adc_var);
-  78   4              adc_target = 0;
-  79   4            }
-  80   3          }
-  81   2              }
-  82   1      }
+  53   1              while(1)
+  54   1              {
+  55   2                ADC_Start(/*adc_target*/);
+  56   2      
+  57   2      
+  58   2      //              if(Frame2CmdConvert() == 1)
+  59   2      //              {
+  60   2      //      if(sta_msg_send_complete == 1)
+  61   2      //        UpdateFrame();
+  62   2      //              }
+  63   2      
+  64   2                      UART_GetBuff();
+  65   2      
+  66   2                      if(cmd_msg_valid == 1)
+  67   2                      {
+  68   3            SPI_Send();
+  69   3            cmd_msg_valid = 0;
+  70   3          }
+  71   2      
+  72   2                      if(sta_msg_send_complete == 1)
+  73   2          {
+  74   3                        if(Frame2CmdConvert() == 1)
+  75   3                          UpdateFrame();
+  76   3      
+  77   3            UpdateSta();
+  78   3            UART_Send();
+  79   3          }
+  80   2      
+  81   2                      if(ADC_Get(&adc_var) == 1)
+  82   2          {
+  83   3      //      if(adc_target == 0)
+  84   3      //      {
+  85   3              Teamperature_Convert(adc_var);
+  86   3      //        adc_target = 1;
+  87   3      //      }
+  88   3      //      else
+  89   3      //      {
+  90   3      //        Bite_Convert(adc_var);
+  91   3      //        adc_target = 0;
+  92   3      //      }
+  93   3          }
+  94   2              }
+  95   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    117    ----
+   CODE SIZE        =    226    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
-   PDATA SIZE       =   ----       3
+   PDATA SIZE       =   ----      10
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----

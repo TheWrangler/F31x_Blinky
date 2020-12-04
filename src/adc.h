@@ -1,7 +1,7 @@
 /*
  * adc.h
  *
- *  Created on: 2020Äê1ÔÂ22ÈÕ
+ *  Created on: 2020ï¿½ï¿½1ï¿½ï¿½22ï¿½ï¿½
  *      Author: wrangler
  */
 
@@ -11,6 +11,6 @@
 void ADC_Init();
 void ADC_ISR();
 char ADC_Get(unsigned int *pVar);
-void ADC_Start(char target);
+void ADC_Start(/*char target*/);
 
 #endif /* ADC_H_ */

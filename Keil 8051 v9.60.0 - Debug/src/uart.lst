@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   UART                                                              12/02/2020 17:39:15 PAGE 1   
+C51 COMPILER V9.60.0.0   UART                                                              12/04/2020 18:46:43 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE UART
@@ -63,7 +63,7 @@ line level    source
   50   2                      SCON0 &= ~0x02;
   51   2                      if(sta_msg_send_count == sta_msg_len)
   52   2                      {
-C51 COMPILER V9.60.0.0   UART                                                              12/02/2020 17:39:15 PAGE 2   
+C51 COMPILER V9.60.0.0   UART                                                              12/04/2020 18:46:43 PAGE 2   
 
   53   3                              sta_msg_send_complete = 1;
   54   3                              return;
@@ -111,7 +111,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =    198    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
-   PDATA SIZE       =     15    ----
+   PDATA SIZE       =     25    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
